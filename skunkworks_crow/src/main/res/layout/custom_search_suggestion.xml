@@ -6,10 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="58dip"
     style="@style/RtlOverlay.Widget.AppCompat.Search.DropDown">
-    <!-- Icons come first in the layout, since their placement doesn't depend on
-         the placement of the text views. -->
-    <!--android:layout_width="@dimen/abc_dropdownitem_icon_width"-->
-    <!--android:layout_height="48dip"-->
+
     <ImageView
         android:id="@android:id/icon1"
         android:layout_height="0dp"
@@ -49,8 +46,7 @@
         android:layout_alignParentBottom="true"
         android:visibility="gone"
         style="@style/RtlOverlay.Widget.AppCompat.Search.DropDown.Icon2" />
-    <!-- The subtitle comes before the title, since the height of the title depends on whether the
-         subtitle is visible or gone. -->
+
     <TextView android:id="@android:id/text2"
         style="?android:attr/dropDownItemStyle"
         android:textAppearance="?attr/textAppearanceSearchResultSubtitle"
@@ -62,8 +58,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_alignParentBottom="true"
         android:visibility="gone" />
-    <!-- The title is placed above the subtitle, if there is one. If there is no
-         subtitle, it fills the parent. -->
+
     <TextView android:id="@android:id/text1"
         style="?android:attr/dropDownItemStyle"
         android:textAppearance="?attr/textAppearanceSearchResultTitle"
