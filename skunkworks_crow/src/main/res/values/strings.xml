@@ -18,6 +18,9 @@
     <string name="version">Version: %1$s</string>
     <string name="id">ID: %1s</string>
 
+    <string name="search_history_pref_title">Delete local search history</string>
+    <string name="search_history_pref_summary">Remove all the searches that you performed on this device</string>
+
     <string name="connect_wifi">Connect to wifi</string>
     <string name="receive_forms">Receive</string>
     <string name="enable_wifi">Enable Wifi to start scan</string>

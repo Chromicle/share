@@ -59,6 +59,10 @@
             android:name=".provider.InstanceMapProvider"
             android:authorities="org.odk.share.provider.odk.map" />
 
+        <provider
+            android:authorities="org.odk.share.activities.SearchSuggestionProvider"
+            android:name=".activities.SearchSuggestionProvider" />
+
         <activity android:name=".activities.SendFormsActivity"></activity>
     </application>
 

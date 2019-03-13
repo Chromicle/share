@@ -13,6 +13,8 @@
         android:icon="@drawable/ic_search"
         android:title="@string/search_list"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always|collapseActionView"/>
+        app:showAsAction="always|collapseActionView"
+        android:authorities="org.odk.share.activities.SearchSuggestionProvider"
+        android:searchSuggestSelection=" ?"/>
 
 </menu>

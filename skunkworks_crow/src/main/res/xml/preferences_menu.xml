@@ -20,12 +20,16 @@
             android:key="hotspot_pwd_require"
             android:summary="@string/password_hotspot"
             android:title="@string/set_password" />
-
         <EditTextPreference
             android:defaultValue="@string/default_odk_destination_dir"
             android:summary="@string/default_odk_destination_dir"
             android:title="@string/title_odk_destination_dir"
             android:key="odk_destination_dir" />
+        <Preference
+            android:dialogTitle="@string/search_history_pref_title"
+            android:key="deleteSearchHistoryPreference"
+            android:summary="@string/search_history_pref_summary"
+            android:title="@string/search_history_pref_title" />
 
     </PreferenceCategory>
 </PreferenceScreen>

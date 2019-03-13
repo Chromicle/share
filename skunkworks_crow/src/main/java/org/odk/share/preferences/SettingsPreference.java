@@ -8,6 +8,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import org.odk.share.R;
+import org.odk.share.activities.SearchSuggestionProvider;
 
 
 /**
@@ -37,6 +39,8 @@ public class SettingsPreference extends PreferenceActivity {
 
         root.addView(toolbar, 0);
 
+
+
         addPreferencesFromResource(R.xml.preferences_menu);
         addPreferences();
     }
@@ -56,6 +60,13 @@ public class SettingsPreference extends PreferenceActivity {
         odkDestinationDirPreference = (EditTextPreference) findPreference(PreferenceKeys.KEY_ODK_DESTINATION_DIR);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        Preference deleteSearchHistoryButton = findPreference("deleteSearchHistoryPreference");
+        deleteSearchHistoryButton.setOnPreferenceClickListener(preference -> {
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(), SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
+            suggestions.clearHistory();
+            return true;
+        });
 
         hotspotNamePreference.setSummary(prefs.getString(PreferenceKeys.KEY_HOTSPOT_NAME,
                 getString(R.string.default_hotspot_ssid)));

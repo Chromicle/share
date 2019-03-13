@@ -19,6 +19,7 @@ package org.odk.share.activities;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -36,7 +37,10 @@ import org.odk.share.adapters.SortDialogAdapter;
 import java.util.LinkedHashSet;
 
 import timber.log.Timber;
+import android.provider.SearchRecentSuggestions;
 
+import static java.security.AccessController.getContext;
+import static org.odk.share.activities.SearchSuggestionProvider.*;
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
 
@@ -109,6 +113,10 @@ abstract class AppListActivity extends InjectableActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
+                suggestions.saveRecentQuery(query, null);
+                
                 filterText = query;
                 updateAdapter();
                 searchView.clearFocus();
