@@ -332,6 +332,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     public void startScan() {
         scanWifi.setEnabled(false);
         scanWifi.setBackground(getResources().getDrawable(R.drawable.selector_bottom_recive));
+        scanWifi.setTextColor(getResources().getColor(R.color.colorTabActive));
         scanResultList.clear();
         wifiResultAdapter.notifyDataSetChanged();
         setEmptyViewVisibility(getString(R.string.scanning));
@@ -354,6 +355,8 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
             wifiResultAdapter.notifyDataSetChanged();
             scanWifi.setEnabled(true);
             scanWifi.setBackground(getResources().getDrawable(R.drawable.selector_bottom_text_common));
+            scanWifi.setTextColor(getResources().getColor(R.color.colorPrimary));
+            scanQRCode.setTextColor(getResources().getColor(R.color.colorPrimary));
             setEmptyViewVisibility(getString(R.string.no_wifi_available));
 
 

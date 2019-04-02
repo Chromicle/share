@@ -32,12 +32,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
 
             <Button
                 android:id="@+id/bToggle"
-                android:layout_width="150dp"
+                android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="@drawable/selector_bottom_text_common"
                 android:gravity="center"
@@ -51,15 +54,18 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
             <Button
                 android:id="@+id/bAction"
-                android:layout_width="150dp"
+                android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="@drawable/selector_bottom_recive"
                 android:gravity="center"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/colorTabActive"
                 android:textSize="14sp" />
         </LinearLayout>
 

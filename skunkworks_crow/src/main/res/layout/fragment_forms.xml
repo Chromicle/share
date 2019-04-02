@@ -27,18 +27,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
             <Button
                 android:id="@+id/toggle_button"
-                android:layout_width="175dp"
+                android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="@drawable/selector_bottom_text_common"
                 android:gravity="center"
@@ -53,18 +55,21 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
             <Button
                 android:id="@+id/send_button"
-                android:layout_width="175dp"
+                android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="@drawable/selector_bottom_recive"
                 android:enabled="false"
                 android:gravity="center"
                 android:text="@string/send_selected"
                 android:textAllCaps="false"
-                android:textColor="@color/colorPrimary"
+                android:textColor="#FFF"
                 android:textSize="14sp" />
 
         </LinearLayout>
