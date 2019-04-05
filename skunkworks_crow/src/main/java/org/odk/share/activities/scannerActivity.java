@@ -5,7 +5,6 @@ package org.odk.share.activities;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -15,14 +14,11 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
 import org.odk.share.R;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import butterknife.BindView;
 
 public class scannerActivity extends AppCompatActivity implements
         DecoratedBarcodeView.TorchListener {
-
-    @BindView(R.id.zxing_barcode_scanner)
-    DecoratedBarcodeView barcodeView;
 
     private CaptureManager capture;
     private DecoratedBarcodeView barcodeScannerView;
@@ -118,7 +114,7 @@ public class scannerActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
     }
 
