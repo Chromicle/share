@@ -57,7 +57,6 @@ import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
-import static org.odk.share.R.layout.activity_wifi;
 import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
 import static org.odk.share.utilities.QRCodeUtils.PORT;
 import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
@@ -112,7 +111,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(activity_wifi);
+        setContentView(R.layout.activity_wifi);
         ButterKnife.bind(this);
 
         setTitle(getString(R.string.connect_wifi));
@@ -324,9 +323,7 @@ public class WifiActivity extends InjectableActivity implements OnItemClickListe
 
     @OnClick(R.id.bScanQRCode)
     public void scanQRCode() {
-        IntentIntegrator integrator = new IntentIntegrator((this));
-
-        integrator
+        new IntentIntegrator((this))
                 .setPrompt(getString(R.string.scan_qr_code))
                 .setDesiredBarcodeFormats(QR_CODE_TYPES)
                 .setCameraId(0)
