@@ -18,6 +18,12 @@
     <string name="version">Version: %1$s</string>
     <string name="id">ID: %1s</string>
 
+    <string name="crash_dialog_title">Error occurred</string>
+    <string name="crash_dialog_message">Sorry ! An Unknown error has occurred. Please report the details to developers so that it can be resolved as soon as possible.</string>
+    <string name="crash_dialog_positive_button">Restart</string>
+    <string name="crash_dialog_negative_button">Close</string>
+    <string name="crash_dialog_neutral_button">Send report and restart</string>
+
     <string name="connect_wifi">Connect to wifi</string>
     <string name="receive_forms">Receive</string>
     <string name="enable_wifi">Enable Wifi to start scan</string>

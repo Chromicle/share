@@ -24,6 +24,7 @@ import org.odk.share.adapters.basecursoradapter.ItemClickListener;
 import org.odk.share.application.Share;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.preferences.SettingsPreference;
+import org.odk.share.utilities.ForceClose;
 
 import javax.inject.Inject;
 
@@ -93,6 +94,18 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         setUpLoader();
 
         addListItemDivider();
+
+        Thread.setDefaultUncaughtExceptionHandler(new ForceClose(this));
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            Boolean flag = extras.getBoolean("flag");
+            String errorReport = extras.getString("error");
+            if (flag) {
+                showAppCrashDialog(errorReport);
+            }
+        }
+
+
     }
 
     private void setupAdapter() {
@@ -272,4 +285,42 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
             }
         }
     }
+
+    public void showAppCrashDialog(String error) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        alertDialogBuilder.setTitle(R.string.crash_dialog_title);
+        // set dialog message
+        alertDialogBuilder
+                .setMessage(R.string.crash_dialog_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.crash_dialog_positive_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton(R.string.crash_dialog_negative_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finishAffinity();
+                    }
+                })
+                .setNeutralButton(R.string.crash_dialog_neutral_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent email = new Intent(Intent.ACTION_SEND);
+                        email.putExtra(Intent.EXTRA_SUBJECT, "ShunworksCrow Android Crashed");
+                        email.putExtra(Intent.EXTRA_TEXT, error);
+                        //need this to prompts email client only
+                        email.setType("message/rfc822");
+
+                        startActivity(Intent.createChooser(email, "Choose an Email client :"));
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+
+
 }
