@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "org.odk.share"
-        minSdkVersion 27
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -25,9 +25,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    lintOptions {
-        abortOnError false
     }
 }
 
