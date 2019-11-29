@@ -6,23 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import java.util.ArrayList;
+import java.util.List;
 import org.odk.share.R;
 import org.odk.share.views.listeners.OnItemClickListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-/**
- * Created by laksh on 8/1/2018.
- */
-
+/** Created by laksh on 8/1/2018. */
 public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ViewHolder> {
     private Context context;
     private List<AboutItem> aboutItems;
@@ -61,7 +54,8 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull final AboutAdapter.ViewHolder holder, int position) {
         holder.title.setText(context.getString(aboutItems.get(position).getTitle()));
-        holder.icon.setImageDrawable(context.getResources().getDrawable(aboutItems.get(position).getIcon()));
+        holder.icon.setImageDrawable(
+                context.getResources().getDrawable(aboutItems.get(position).getIcon()));
         holder.itemView.setOnClickListener(v -> listener.onItemClick(v, holder.getAdapterPosition()));
     }
 
@@ -74,6 +68,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.ViewHolder> 
 
         @BindView(R.id.tvTitle)
         public TextView title;
+
         @BindView(R.id.ivIcon)
         public ImageView icon;
 

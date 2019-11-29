@@ -13,7 +13,8 @@ public class BluetoothEvent extends RxEvent {
     }
 
     public enum Status {
-        CONNECTED, DISCONNECTED
+        CONNECTED,
+        DISCONNECTED
     }
 
     @Override

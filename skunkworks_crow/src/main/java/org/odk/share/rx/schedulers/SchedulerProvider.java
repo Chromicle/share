@@ -1,16 +1,12 @@
 package org.odk.share.rx.schedulers;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-/**
- * @author Shobhit Agarwal
- */
-
+/** @author Shobhit Agarwal */
 public class SchedulerProvider implements BaseSchedulerProvider {
     private static final Executor backgroundExecutor = Executors.newCachedThreadPool();
     private static final Scheduler BACKGROUND_SCHEDULERS = Schedulers.from(backgroundExecutor);

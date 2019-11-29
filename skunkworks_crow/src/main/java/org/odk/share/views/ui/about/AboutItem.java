@@ -1,20 +1,17 @@
 package org.odk.share.views.ui.about;
 
-
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 
 /**
- * AboutItem: Data Wrapper for About Page Item.
- *
- * @author huangyz0918 (huangyz0918@gmail.com)
- */
+* AboutItem: Data Wrapper for About Page Item.
+*
+* @author huangyz0918 (huangyz0918@gmail.com)
+*/
 public class AboutItem {
 
-    private @StringRes
-    int titleRes;
-    private @DrawableRes
-    int iconRes;
+    private @StringRes int titleRes;
+    private @DrawableRes int iconRes;
 
     public AboutItem(@StringRes int titleRes, @DrawableRes int iconRes) {
         this.titleRes = titleRes;

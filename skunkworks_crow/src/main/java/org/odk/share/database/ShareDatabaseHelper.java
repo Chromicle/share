@@ -1,14 +1,5 @@
 package org.odk.share.database;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import org.odk.share.application.Share;
-
-import timber.log.Timber;
-
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.dto.TransferInstance.ID;
 import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
@@ -20,10 +11,14 @@ import static org.odk.share.dto.TransferInstance.STATUS_UNREVIEWED;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.dto.TransferInstance.VISITED_COUNT;
 
-/**
- * Created by laksh on 6/13/2018.
- */
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import org.odk.share.application.Share;
+import timber.log.Timber;
 
+/** Created by laksh on 6/13/2018. */
 public class ShareDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "share.db";
@@ -50,21 +45,37 @@ public class ShareDatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createInstancesTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + SHARE_TABLE_NAME + " ("
-                + ID + " integer primary key, "
-                + REVIEW_STATUS + " integer, "
-                + INSTRUCTIONS + " text, "
-                + INSTANCE_ID + " integer not null, "
-                + TRANSFER_STATUS + " text not null, "
-                + RECEIVED_REVIEW_STATUS + " integer,"
-                + VISITED_COUNT + " integer, "
-                + LAST_STATUS_CHANGE_DATE + " date not null ); ");
+        db.execSQL(
+                "CREATE TABLE "
+                        + SHARE_TABLE_NAME
+                        + " ("
+                        + ID
+                        + " integer primary key, "
+                        + REVIEW_STATUS
+                        + " integer, "
+                        + INSTRUCTIONS
+                        + " text, "
+                        + INSTANCE_ID
+                        + " integer not null, "
+                        + TRANSFER_STATUS
+                        + " text not null, "
+                        + RECEIVED_REVIEW_STATUS
+                        + " integer,"
+                        + VISITED_COUNT
+                        + " integer, "
+                        + LAST_STATUS_CHANGE_DATE
+                        + " date not null ); ");
 
-        db.execSQL("CREATE TABLE " + SHARE_INSTANCE_TABLE + " ("
-                + ID + " integer primary key, "
-                + INSTANCE_UUID + " text not null, "
-                + INSTANCE_ID + " integer not null ); ");
-
+        db.execSQL(
+                "CREATE TABLE "
+                        + SHARE_INSTANCE_TABLE
+                        + " ("
+                        + ID
+                        + " integer primary key, "
+                        + INSTANCE_UUID
+                        + " text not null, "
+                        + INSTANCE_ID
+                        + " integer not null ); ");
     }
 
     public long insertInstance(ContentValues values) {

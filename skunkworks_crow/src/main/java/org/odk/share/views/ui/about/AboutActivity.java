@@ -1,30 +1,29 @@
 package org.odk.share.views.ui.about;
 
+import static org.odk.share.views.ui.about.WebViewActivity.OPEN_URL;
+import static org.odk.share.views.ui.about.WebViewActivity.TITLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import org.odk.share.R;
 import org.odk.share.views.listeners.OnItemClickListener;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-import static org.odk.share.views.ui.about.WebViewActivity.OPEN_URL;
-import static org.odk.share.views.ui.about.WebViewActivity.TITLE;
-
 public class AboutActivity extends AppCompatActivity implements OnItemClickListener {
 
-    private static final String LICENSES_HTML_PATH = "file:///android_asset/open_source_licenses.html";
+    private static final String LICENSES_HTML_PATH =
+            "file:///android_asset/open_source_licenses.html";
     private static final String USER_GUIDE_HTML_PATH = "file:///android_asset/user_guide.html";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 

@@ -44,7 +44,10 @@ public class UploadEvent extends RxEvent {
     }
 
     public enum Status {
-        QUEUED, UPLOADING, FINISHED, ERROR, CANCELLED
+        QUEUED,
+        UPLOADING,
+        FINISHED,
+        ERROR,
+        CANCELLED
     }
-
 }

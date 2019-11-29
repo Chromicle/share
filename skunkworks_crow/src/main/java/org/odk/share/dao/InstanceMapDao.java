@@ -1,22 +1,16 @@
 package org.odk.share.dao;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-
-import java.util.HashMap;
-
-import timber.log.Timber;
-
 import static org.odk.share.dto.InstanceMap.INSTANCE_ID;
 import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
 import static org.odk.share.provider.InstanceMapProvider.CONTENT_URI;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import java.util.HashMap;
+import timber.log.Timber;
 
-/**
- * Created by laksh on 8/2/2018.
- */
-
+/** Created by laksh on 8/2/2018. */
 public class InstanceMapDao {
 
     private Context context;
@@ -66,8 +60,11 @@ public class InstanceMapDao {
         return instanceMap;
     }
 
-    public Cursor getInstancesCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return context.getContentResolver().query(CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+    public Cursor getInstancesCursor(
+            String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return context
+                .getContentResolver()
+                .query(CONTENT_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     public long getInstanceId(String uuid) {

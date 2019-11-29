@@ -4,16 +4,13 @@ import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
-
+import java.util.LinkedList;
+import java.util.Queue;
 import org.odk.share.application.Share;
 import org.odk.share.events.DownloadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.tasks.DownloadJob;
-
-import java.util.LinkedList;
-import java.util.Queue;
-
 import timber.log.Timber;
 
 public class ReceiverService {
@@ -32,26 +29,29 @@ public class ReceiverService {
     }
 
     private void addDownloadJobSubscription() {
-        rxEventBus.register(DownloadEvent.class)
+        rxEventBus
+                .register(DownloadEvent.class)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.androidThread())
-                .doOnNext(downloadEvent -> {
-                    switch (downloadEvent.getStatus()) {
-                        case CANCELLED:
-                        case ERROR:
-                            jobs.clear();
-                            currentJob = null;
-                            break;
+                .doOnNext(
+                        downloadEvent -> {
+                            switch (downloadEvent.getStatus()) {
+                                case CANCELLED:
+                                case ERROR:
+                                    jobs.clear();
+                                    currentJob = null;
+                                    break;
 
-                        case FINISHED:
-                            if (jobs.size() > 0) {
-                                startJob(jobs.remove());
-                            } else {
-                                currentJob = null;
+                                case FINISHED:
+                                    if (jobs.size() > 0) {
+                                        startJob(jobs.remove());
+                                    } else {
+                                        currentJob = null;
+                                    }
+                                    break;
                             }
-                            break;
-                    }
-                }).subscribe();
+                        })
+                .subscribe();
     }
 
     public void startBtDownloading(String macAddress) {
@@ -70,10 +70,8 @@ public class ReceiverService {
     }
 
     private void startJob(PersistableBundleCompat extras) {
-        JobRequest request = new JobRequest.Builder(DownloadJob.TAG)
-                .addExtras(extras)
-                .startNow()
-                .build();
+        JobRequest request =
+                new JobRequest.Builder(DownloadJob.TAG).addExtras(extras).startNow().build();
 
         if (currentJob != null) {
             jobs.add(request);

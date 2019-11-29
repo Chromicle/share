@@ -1,19 +1,5 @@
 package org.odk.share.utilities;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.shadow.api.Shadow;
-import org.robolectric.shadows.ShadowBluetoothAdapter;
-import org.robolectric.shadows.ShadowBluetoothDevice;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import static android.bluetooth.BluetoothAdapter.STATE_OFF;
 import static android.bluetooth.BluetoothAdapter.STATE_ON;
 import static android.bluetooth.BluetoothAdapter.STATE_TURNING_OFF;
@@ -24,10 +10,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadow.api.Shadow;
+import org.robolectric.shadows.ShadowBluetoothAdapter;
+import org.robolectric.shadows.ShadowBluetoothDevice;
 
-/**
- * {@link Test} for basic operation related to {@link BluetoothAdapter} and bluetooth utilities.
- */
+/** {@link Test} for basic operation related to {@link BluetoothAdapter} and bluetooth utilities. */
 @RunWith(RobolectricTestRunner.class)
 public class BluetoothUtilsTest {
 
@@ -40,36 +35,28 @@ public class BluetoothUtilsTest {
         shadowBluetoothAdapter = shadowOf(bluetoothAdapter);
     }
 
-    /**
-     * {@link Test} the enable method of {@link BluetoothAdapter}.
-     */
+    /** {@link Test} the enable method of {@link BluetoothAdapter}. */
     @Test
     public void enableBluetoothTest() {
         shadowBluetoothAdapter.setEnabled(true);
         assertTrue(bluetoothAdapter.isEnabled());
     }
 
-    /**
-     * {@link Test} the disable method of {@link BluetoothAdapter}.
-     */
+    /** {@link Test} the disable method of {@link BluetoothAdapter}. */
     @Test
     public void disableBluetoothTest() {
         shadowBluetoothAdapter.setEnabled(false);
         assertFalse(bluetoothAdapter.isEnabled());
     }
 
-    /**
-     * {@link Test} the bluetooth adapter no null, that support the bluetooth feature.
-     */
+    /** {@link Test} the bluetooth adapter no null, that support the bluetooth feature. */
     @Test
     public void supportBluetoothTest() {
         assertNotNull(bluetoothAdapter);
         assertNotNull(shadowBluetoothAdapter);
     }
 
-    /**
-     * {@link Test} the bluetooth status.
-     */
+    /** {@link Test} the bluetooth status. */
     @Test
     public void bluetoothStatusTest() {
         // STATE_OFF
@@ -89,9 +76,7 @@ public class BluetoothUtilsTest {
         assertEquals(STATE_TURNING_OFF, bluetoothAdapter.getState());
     }
 
-    /**
-     * {@link Test} the bonded {@link BluetoothDevice} from {@link BluetoothAdapter}.
-     */
+    /** {@link Test} the bonded {@link BluetoothDevice} from {@link BluetoothAdapter}. */
     @Test
     public void bondedDevicesTest() {
         Set<BluetoothDevice> bondedDevices = new HashSet<>();
@@ -103,9 +88,7 @@ public class BluetoothUtilsTest {
         assertEquals(bondedDevices, bluetoothAdapter.getBondedDevices());
     }
 
-    /**
-     * {@link Test} the bluetooth address of devices.
-     */
+    /** {@link Test} the bluetooth address of devices. */
     @Test
     public void bluetoothAddressTest() {
         shadowBluetoothAdapter.setAddress("A0:8D:16:F3:97:4D");

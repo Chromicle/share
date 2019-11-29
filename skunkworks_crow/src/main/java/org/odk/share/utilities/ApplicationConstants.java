@@ -1,15 +1,10 @@
 package org.odk.share.utilities;
 
 import android.content.Context;
-
+import java.util.HashMap;
 import org.odk.share.R;
 
-import java.util.HashMap;
-
-/**
- * Created by laksh on 5/20/2018.
- */
-
+/** Created by laksh on 5/20/2018. */
 public class ApplicationConstants {
 
     // based on http://www.sqlite.org/limits.html
@@ -19,9 +14,7 @@ public class ApplicationConstants {
     public static final int SEND_BLANK_FORM_MODE = 3;
     public static final int SEND_FILL_FORM_MODE = 4;
 
-    private ApplicationConstants() {
-
-    }
+    private ApplicationConstants() {}
 
     public static HashMap<String, Integer> getSortLabelToIconMap(Context context) {
         HashMap<String, Integer> hashMap = new HashMap<>();

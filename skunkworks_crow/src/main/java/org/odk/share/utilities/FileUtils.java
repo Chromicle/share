@@ -4,9 +4,7 @@ import java.util.Locale;
 
 public final class FileUtils {
 
-    private FileUtils() {
-
-    }
+    private FileUtils() {}
 
     public static String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');

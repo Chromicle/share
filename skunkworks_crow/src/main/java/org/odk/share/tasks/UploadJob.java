@@ -1,15 +1,37 @@
 package org.odk.share.tasks;
 
+import static org.odk.share.bluetooth.BluetoothUtils.SPP_UUID;
+import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
+import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
+import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
+import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
+import static org.odk.share.tasks.DownloadJob.RESULT_DIVIDER;
+import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
+import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
 import android.database.Cursor;
-
 import androidx.annotation.NonNull;
-
 import com.evernote.android.job.Job;
-
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.inject.Inject;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.FormsProviderAPI;
@@ -26,35 +48,7 @@ import org.odk.share.rx.RxEventBus;
 import org.odk.share.utilities.ApplicationConstants;
 import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.utilities.FileUtils;
-
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import timber.log.Timber;
-
-import static org.odk.share.bluetooth.BluetoothUtils.SPP_UUID;
-import static org.odk.share.dto.InstanceMap.INSTANCE_UUID;
-import static org.odk.share.dto.TransferInstance.INSTANCE_ID;
-import static org.odk.share.dto.TransferInstance.STATUS_FORM_SENT;
-import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
-import static org.odk.share.tasks.DownloadJob.RESULT_DIVIDER;
-import static org.odk.share.utilities.ApplicationConstants.SEND_BLANK_FORM_MODE;
-import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
 public class UploadJob extends Job {
 
@@ -62,20 +56,15 @@ public class UploadJob extends Job {
     public static final String INSTANCES = "instances";
     public static final String PORT = "port";
 
-    @Inject
-    RxEventBus rxEventBus;
+    @Inject RxEventBus rxEventBus;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
-    @Inject
-    FormsDao formsDao;
+    @Inject FormsDao formsDao;
 
-    @Inject
-    InstanceMapDao instanceMapDao;
+    @Inject InstanceMapDao instanceMapDao;
 
-    @Inject
-    TransferDao transferDao;
+    @Inject TransferDao transferDao;
 
     private int port;
     private Long[] instancesToSend;
@@ -119,7 +108,8 @@ public class UploadJob extends Job {
             switch (method) {
                 case Share.TransferMethod.BLUETOOTH:
                     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                    bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+                    bluetoothServerSocket =
+                            bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
                     bluetoothSocket = bluetoothServerSocket.accept();
 
                     if (bluetoothSocket.isConnected()) {
@@ -221,9 +211,11 @@ public class UploadJob extends Job {
                 Timber.e(e);
             }
         } else {
-            // map that stores key as formId and value is another map which contains version as key and List with instances as value
+            // map that stores key as formId and value is another map which contains version as key and
+            // List with instances as value
             Map<String, Map<String, List<String>>> formMap = new HashMap<>();
-            StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
+            StringBuilder selectionBuf =
+                    new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
             String[] selectionArgs = new String[ids.length];
             for (int i = 0; i < ids.length; i++) {
                 if (i > 0) {
@@ -241,8 +233,12 @@ public class UploadJob extends Job {
                 if (cursor != null && cursor.getCount() > 0) {
                     cursor.moveToPosition(-1);
                     while (cursor.moveToNext()) {
-                        String formId = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
-                        String formVersion = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
+                        String formId =
+                                cursor.getString(
+                                        cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
+                        String formVersion =
+                                cursor.getString(
+                                        cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_VERSION));
 
                         Map<String, List<String>> instanceMap;
                         if (formMap.containsKey(formId)) {
@@ -261,7 +257,8 @@ public class UploadJob extends Job {
                             count++;
                         }
 
-                        instancesList.add(cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                        instancesList.add(
+                                cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                     }
                 }
                 Timber.d(String.valueOf(formMap));
@@ -307,13 +304,19 @@ public class UploadJob extends Job {
         String selection;
 
         if (formVersion == null) {
-            selectionArgs = new String[]{formId};
-            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
-                    + FormsProviderAPI.FormsColumns.JR_VERSION + " IS NULL";
+            selectionArgs = new String[] {formId};
+            selection =
+                    FormsProviderAPI.FormsColumns.JR_FORM_ID
+                            + "=? AND "
+                            + FormsProviderAPI.FormsColumns.JR_VERSION
+                            + " IS NULL";
         } else {
-            selectionArgs = new String[]{formId, formVersion};
-            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
-                    + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
+            selectionArgs = new String[] {formId, formVersion};
+            selection =
+                    FormsProviderAPI.FormsColumns.JR_FORM_ID
+                            + "=? AND "
+                            + FormsProviderAPI.FormsColumns.JR_VERSION
+                            + "=?";
         }
 
         try (Cursor cursor = formsDao.getFormsCursor(null, selection, selectionArgs, null)) {
@@ -326,12 +329,18 @@ public class UploadJob extends Job {
     }
 
     private void sendBlankForm(Cursor cursor) {
-        String displayName = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
-        String formMediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
-        String formFilePath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
-        String submissionUri = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
-        String formId = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
-        String formVersion = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
+        String displayName =
+                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
+        String formMediaPath =
+                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
+        String formFilePath =
+                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
+        String submissionUri =
+                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
+        String formId =
+                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
+        String formVersion =
+                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
 
         try {
             dos.writeUTF(displayName);
@@ -392,12 +401,24 @@ public class UploadJob extends Job {
                     dos.writeInt(0);
                 }
 
-                sbResult.append(getContext().getString(R.string.form_transfer_result,
-                        getContext().getString(R.string.success, ", " +
-                                getContext().getString(R.string.blank_form_count,
-                                        getContext().getString(R.string.sent)))));
+                sbResult.append(
+                        getContext()
+                                .getString(
+                                        R.string.form_transfer_result,
+                                        getContext()
+                                                .getString(
+                                                        R.string.success,
+                                                        ", "
+                                                                + getContext()
+                                                                        .getString(
+                                                                                R.string.blank_form_count,
+                                                                                getContext().getString(R.string.sent)))));
             } else {
-                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
+                sbResult.append(
+                        getContext()
+                                .getString(
+                                        R.string.form_transfer_result,
+                                        getContext().getString(R.string.msg_form_already_exist)));
             }
             sbResult.append(RESULT_DIVIDER);
         } catch (IOException e) {
@@ -406,7 +427,8 @@ public class UploadJob extends Job {
     }
 
     private void sendInstances(List<String> instanceIds, int progress, int total) {
-        StringBuilder selectionBuf = new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
+        StringBuilder selectionBuf =
+                new StringBuilder(InstanceProviderAPI.InstanceColumns._ID + " IN (");
         String[] selectionArgs = new String[instanceIds.size()];
         for (int i = 0; i < instanceIds.size(); i++) {
             if (i > 0) {
@@ -440,10 +462,10 @@ public class UploadJob extends Job {
                     dos.writeInt(mode);
                     Timber.d("Sent uuid %s and mode %s", instanceMap.get(id), mode);
 
-                    String displayName = c.getString(
-                            c.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
-                    String submissionUri = c.getString(
-                            c.getColumnIndex(InstanceProviderAPI.InstanceColumns.SUBMISSION_URI));
+                    String displayName =
+                            c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
+                    String submissionUri =
+                            c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.SUBMISSION_URI));
 
                     dos.writeUTF(displayName);
 
@@ -462,13 +484,19 @@ public class UploadJob extends Job {
                         boolean isFormSentForReview = dis.readBoolean();
                         Timber.d("isFormSentForReview " + isFormSentForReview);
                         if (!isFormSentForReview) {
-                            setupResultText(displayName, getContext().getString(R.string.failed,
-                                    ", " + getContext().getString(R.string.review_not_asked)));
+                            setupResultText(
+                                    displayName,
+                                    getContext()
+                                            .getString(
+                                                    R.string.failed,
+                                                    ", " + getContext().getString(R.string.review_not_asked)));
                             continue;
                         } else {
-                            TransferInstance transferInstance = transferDao.getReceivedTransferInstanceFromInstanceId(id);
+                            TransferInstance transferInstance =
+                                    transferDao.getReceivedTransferInstanceFromInstanceId(id);
                             dos.writeInt(transferInstance.getReviewed());
-                            if (transferInstance.getInstructions() != null && transferInstance.getInstructions().length() > 0) {
+                            if (transferInstance.getInstructions() != null
+                                    && transferInstance.getInstructions().length() > 0) {
                                 dos.writeUTF(transferInstance.getInstructions());
                             } else {
                                 dos.writeUTF("-1");
@@ -478,15 +506,18 @@ public class UploadJob extends Job {
                     }
 
                     // mode tells whether its the review process or send process
-                    String instance = c.getString(
-                            c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
+                    String instance =
+                            c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
 
                     sendInstance(instance);
 
                     if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
                         // sent the review with the updated files
-                        setupResultText(displayName, getContext().getString(R.string.success,
-                                ", " + getContext().getString(R.string.review_sent)));
+                        setupResultText(
+                                displayName,
+                                getContext()
+                                        .getString(
+                                                R.string.success, ", " + getContext().getString(R.string.review_sent)));
                     } else {
                         // sent for review and update in transfer.db
                         // check if it already exists at receiver end or not
@@ -498,16 +529,24 @@ public class UploadJob extends Job {
                         boolean isFormAlreadySentForReview = dis.readBoolean();
                         Timber.d("isFormAlreadySentForReview " + isFormAlreadySentForReview);
                         if (isFormAlreadySentForReview) {
-                            setupResultText(displayName, getContext().getString(R.string.success,
-                                    ", " + getContext().getString(R.string.sent_again)));
+                            setupResultText(
+                                    displayName,
+                                    getContext()
+                                            .getString(
+                                                    R.string.success, ", " + getContext().getString(R.string.sent_again)));
                         } else {
                             ContentValues values = new ContentValues();
-                            values.put(INSTANCE_ID,
+                            values.put(
+                                    INSTANCE_ID,
                                     c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                             values.put(TRANSFER_STATUS, STATUS_FORM_SENT);
                             new ShareDatabaseHelper(getContext()).insertInstance(values);
-                            setupResultText(displayName, getContext().getString(R.string.success,
-                                    ", " + getContext().getString(R.string.sent_for_review)));
+                            setupResultText(
+                                    displayName,
+                                    getContext()
+                                            .getString(
+                                                    R.string.success,
+                                                    ", " + getContext().getString(R.string.sent_for_review)));
                         }
                     }
                 }

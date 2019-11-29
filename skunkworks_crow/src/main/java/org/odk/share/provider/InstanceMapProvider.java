@@ -1,5 +1,7 @@
 package org.odk.share.provider;
 
+import static org.odk.share.database.ShareDatabaseHelper.SHARE_INSTANCE_TABLE;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -10,19 +12,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-
+import androidx.annotation.NonNull;
 import org.odk.share.application.Share;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 
-import androidx.annotation.NonNull;
-
-import static org.odk.share.database.ShareDatabaseHelper.SHARE_INSTANCE_TABLE;
-
-/**
- * Created by laksh on 8/2/2018.
- */
-
+/** Created by laksh on 8/2/2018. */
 public class InstanceMapProvider extends ContentProvider {
 
     private static final int INSTANCE_MAP = 1;
@@ -58,8 +53,12 @@ public class InstanceMapProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
-                        String[] selectionArgs, String sortOrder) {
+    public Cursor query(
+            @NonNull Uri uri,
+            String[] projection,
+            String selection,
+            String[] selectionArgs,
+            String sortOrder) {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(SHARE_INSTANCE_TABLE);
@@ -68,8 +67,7 @@ public class InstanceMapProvider extends ContentProvider {
             case INSTANCE_MAP:
                 break;
             case INSTANCE_MAP_ID:
-                qb.appendWhere(TransferInstance.ID + "="
-                        + uri.getLastPathSegment());
+                qb.appendWhere(TransferInstance.ID + "=" + uri.getLastPathSegment());
                 break;
 
             default:
@@ -79,7 +77,15 @@ public class InstanceMapProvider extends ContentProvider {
         Cursor c = null;
         ShareDatabaseHelper shareDatabaseHelper = getDbHelper();
         if (shareDatabaseHelper != null) {
-            c = qb.query(shareDatabaseHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
+            c =
+                    qb.query(
+                            shareDatabaseHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
             c.setNotificationUri(getContext().getContentResolver(), uri);
         }
 
@@ -107,7 +113,8 @@ public class InstanceMapProvider extends ContentProvider {
                 values = new ContentValues();
             }
 
-            long rowId = shareDatabaseHelper.getWritableDatabase().insert(SHARE_INSTANCE_TABLE, null, values);
+            long rowId =
+                    shareDatabaseHelper.getWritableDatabase().insert(SHARE_INSTANCE_TABLE, null, values);
             if (rowId > 0) {
                 Uri instanceUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(instanceUri, null);
@@ -132,13 +139,14 @@ public class InstanceMapProvider extends ContentProvider {
 
                 case INSTANCE_MAP_ID:
                     String formId = uri.getLastPathSegment();
-                    count = db.delete(
-                            SHARE_INSTANCE_TABLE,
-                            TransferInstance.ID
-                                    + "="
-                                    + formId
-                                    + (!TextUtils.isEmpty(where) ? " AND (" + where
-                                    + ')' : ""), whereArgs);
+                    count =
+                            db.delete(
+                                    SHARE_INSTANCE_TABLE,
+                                    TransferInstance.ID
+                                            + "="
+                                            + formId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
+                                    whereArgs);
                     break;
 
                 default:
@@ -152,8 +160,7 @@ public class InstanceMapProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String where,
-                      String[] whereArgs) {
+    public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
         int count = 0;
         ShareDatabaseHelper shareDatabaseHelper = getDbHelper();
         if (shareDatabaseHelper != null) {
@@ -165,14 +172,15 @@ public class InstanceMapProvider extends ContentProvider {
 
                 case INSTANCE_MAP_ID:
                     String formId = uri.getLastPathSegment();
-                    count = db.update(
-                            SHARE_INSTANCE_TABLE,
-                            values,
-                            TransferInstance.ID
-                                    + "="
-                                    + formId
-                                    + (!TextUtils.isEmpty(where) ? " AND ("
-                                    + where + ')' : ""), whereArgs);
+                    count =
+                            db.update(
+                                    SHARE_INSTANCE_TABLE,
+                                    values,
+                                    TransferInstance.ID
+                                            + "="
+                                            + formId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
+                                    whereArgs);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown URI " + uri);
@@ -189,5 +197,4 @@ public class InstanceMapProvider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, "instance", INSTANCE_MAP);
         sUriMatcher.addURI(AUTHORITY, "instance/#", INSTANCE_MAP_ID);
     }
-
 }

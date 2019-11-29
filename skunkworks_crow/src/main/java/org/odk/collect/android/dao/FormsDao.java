@@ -1,18 +1,18 @@
 /*
- * Copyright 2017 Nafundi
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2017 Nafundi
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.odk.collect.android.dao;
 
@@ -22,13 +22,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import androidx.loader.content.CursorLoader;
-
-import org.odk.collect.android.dto.Form;
-import org.odk.collect.android.provider.FormsProviderAPI;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import org.odk.collect.android.dto.Form;
+import org.odk.collect.android.provider.FormsProviderAPI;
 
 public class FormsDao {
 
@@ -46,8 +43,16 @@ public class FormsDao {
         return getFormsCursor(null, selection, selectionArgs, null);
     }
 
-    public Cursor getFormsCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return context.getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+    public Cursor getFormsCursor(
+            String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return context
+                .getContentResolver()
+                .query(
+                        FormsProviderAPI.FormsColumns.CONTENT_URI,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        sortOrder);
     }
 
     public Cursor getFormsCursor(String formId, String formVersion) {
@@ -55,13 +60,19 @@ public class FormsDao {
         String selection;
 
         if (formVersion == null) {
-            selectionArgs = new String[]{formId};
-            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
-                    + FormsProviderAPI.FormsColumns.JR_VERSION + " IS NULL";
+            selectionArgs = new String[] {formId};
+            selection =
+                    FormsProviderAPI.FormsColumns.JR_FORM_ID
+                            + "=? AND "
+                            + FormsProviderAPI.FormsColumns.JR_VERSION
+                            + " IS NULL";
         } else {
-            selectionArgs = new String[]{formId, formVersion};
-            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
-                    + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
+            selectionArgs = new String[] {formId, formVersion};
+            selection =
+                    FormsProviderAPI.FormsColumns.JR_FORM_ID
+                            + "=? AND "
+                            + FormsProviderAPI.FormsColumns.JR_VERSION
+                            + "=?";
         }
 
         // As long as we allow storing multiple forms with the same id and version number, choose
@@ -76,17 +87,18 @@ public class FormsDao {
     }
 
     /**
-     * Returns a loader filtered by the specified charSequence in the specified sortOrder. If
-     * newestByFormId is true, only the most recently-downloaded version of each form is included.
-     */
-    public CursorLoader getFormsCursorLoader(CharSequence charSequence, String sortOrder, boolean newestByFormId) {
+    * Returns a loader filtered by the specified charSequence in the specified sortOrder. If
+    * newestByFormId is true, only the most recently-downloaded version of each form is included.
+    */
+    public CursorLoader getFormsCursorLoader(
+            CharSequence charSequence, String sortOrder, boolean newestByFormId) {
         CursorLoader cursorLoader;
 
         if (charSequence.length() == 0) {
             cursorLoader = getFormsCursorLoader(sortOrder, newestByFormId);
         } else {
             String selection = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " LIKE ?";
-            String[] selectionArgs = new String[]{"%" + charSequence + "%"};
+            String[] selectionArgs = new String[] {"%" + charSequence + "%"};
 
             cursorLoader = getFormsCursorLoader(selection, selectionArgs, sortOrder, newestByFormId);
         }
@@ -98,12 +110,15 @@ public class FormsDao {
     }
 
     /**
-     * Builds and returns a new CursorLoader, passing on the configuration parameters. If
-     * newestByFormID is true, only the most recently-downloaded version of each form is included.
-     */
-    private CursorLoader getFormsCursorLoader(String selection, String[] selectionArgs, String sortOrder, boolean newestByFormId) {
-        Uri formUri = newestByFormId ? FormsProviderAPI.FormsColumns.CONTENT_NEWEST_FORMS_BY_FORMID_URI
-                : FormsProviderAPI.FormsColumns.CONTENT_URI;
+    * Builds and returns a new CursorLoader, passing on the configuration parameters. If
+    * newestByFormID is true, only the most recently-downloaded version of each form is included.
+    */
+    private CursorLoader getFormsCursorLoader(
+            String selection, String[] selectionArgs, String sortOrder, boolean newestByFormId) {
+        Uri formUri =
+                newestByFormId
+                        ? FormsProviderAPI.FormsColumns.CONTENT_NEWEST_FORMS_BY_FORMID_URI
+                        : FormsProviderAPI.FormsColumns.CONTENT_URI;
 
         return new CursorLoader(context, formUri, null, selection, selectionArgs, sortOrder);
     }
@@ -122,7 +137,8 @@ public class FormsDao {
         if (cursor != null) {
             try {
                 if (cursor.moveToFirst()) {
-                    int base64RSAPublicKeyColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY);
+                    int base64RSAPublicKeyColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY);
                     encrypted = cursor.getString(base64RSAPublicKeyColumnIndex) != null;
                 }
             } finally {
@@ -140,7 +156,8 @@ public class FormsDao {
         if (cursor != null) {
             try {
                 if (cursor.moveToFirst()) {
-                    int formMediaPathColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH);
+                    int formMediaPathColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH);
                     formMediaPath = cursor.getString(formMediaPathColumnIndex);
                 }
             } finally {
@@ -175,8 +192,10 @@ public class FormsDao {
         }
         selection += "? )";
 
-        //This will break if the number of forms to delete > SQLITE_MAX_VARIABLE_NUMBER (999)
-        context.getContentResolver().delete(FormsProviderAPI.FormsColumns.CONTENT_URI, selection, idsToDelete);
+        // This will break if the number of forms to delete > SQLITE_MAX_VARIABLE_NUMBER (999)
+        context
+                .getContentResolver()
+                .delete(FormsProviderAPI.FormsColumns.CONTENT_URI, selection, idsToDelete);
     }
 
     public void deleteFormsFromMd5Hash(String... hashes) {
@@ -210,12 +229,12 @@ public class FormsDao {
     }
 
     public int updateForm(ContentValues values, String where, String[] whereArgs) {
-        return context.getContentResolver().update(FormsProviderAPI.FormsColumns.CONTENT_URI, values, where, whereArgs);
+        return context
+                .getContentResolver()
+                .update(FormsProviderAPI.FormsColumns.CONTENT_URI, values, where, whereArgs);
     }
 
-    /**
-     * Returns all forms available through the cursor and closes the cursor.
-     */
+    /** Returns all forms available through the cursor and closes the cursor. */
     public List<Form> getFormsFromCursor(Cursor cursor) {
         List<Form> forms = new ArrayList<>();
         if (cursor != null) {
@@ -223,42 +242,55 @@ public class FormsDao {
                 cursor.moveToPosition(-1);
                 while (cursor.moveToNext()) {
                     int idColumnIndex = cursor.getColumnIndex(BaseColumns._ID);
-                    int displayNameColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME);
-                    int descriptionColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DESCRIPTION);
+                    int displayNameColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME);
+                    int descriptionColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DESCRIPTION);
                     int jrFormIdColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID);
-                    int jrVersionColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION);
-                    int formFilePathColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH);
-                    int submissionUriColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI);
-                    int base64RSAPublicKeyColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY);
-                    int displaySubtextColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_SUBTEXT);
+                    int jrVersionColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION);
+                    int formFilePathColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH);
+                    int submissionUriColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI);
+                    int base64RSAPublicKeyColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY);
+                    int displaySubtextColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_SUBTEXT);
                     int md5HashColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.MD5_HASH);
                     int dateColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.DATE);
-                    int jrCacheFilePathColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JRCACHE_FILE_PATH);
-                    int formMediaPathColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH);
+                    int jrCacheFilePathColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.JRCACHE_FILE_PATH);
+                    int formMediaPathColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH);
                     int languageColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.LANGUAGE);
                     int autoSendColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.AUTO_SEND);
-                    int autoDeleteColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.AUTO_DELETE);
-                    int lastDetectedFormVersionHashColumnIndex = cursor.getColumnIndex(FormsProviderAPI.FormsColumns.LAST_DETECTED_FORM_VERSION_HASH);
+                    int autoDeleteColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.AUTO_DELETE);
+                    int lastDetectedFormVersionHashColumnIndex =
+                            cursor.getColumnIndex(FormsProviderAPI.FormsColumns.LAST_DETECTED_FORM_VERSION_HASH);
 
-                    Form form = new Form.Builder()
-                            .id(cursor.getInt(idColumnIndex))
-                            .displayName(cursor.getString(displayNameColumnIndex))
-                            .description(cursor.getString(descriptionColumnIndex))
-                            .jrFormId(cursor.getString(jrFormIdColumnIndex))
-                            .jrVersion(cursor.getString(jrVersionColumnIndex))
-                            .formFilePath(cursor.getString(formFilePathColumnIndex))
-                            .submissionUri(cursor.getString(submissionUriColumnIndex))
-                            .base64RSAPublicKey(cursor.getString(base64RSAPublicKeyColumnIndex))
-                            .displaySubtext(cursor.getString(displaySubtextColumnIndex))
-                            .md5Hash(cursor.getString(md5HashColumnIndex))
-                            .date(cursor.getLong(dateColumnIndex))
-                            .jrCacheFilePath(cursor.getString(jrCacheFilePathColumnIndex))
-                            .formMediaPath(cursor.getString(formMediaPathColumnIndex))
-                            .language(cursor.getString(languageColumnIndex))
-                            .autoSend(cursor.getString(autoSendColumnIndex))
-                            .autoDelete(cursor.getString(autoDeleteColumnIndex))
-                            .lastDetectedFormVersionHash(cursor.getString(lastDetectedFormVersionHashColumnIndex))
-                            .build();
+                    Form form =
+                            new Form.Builder()
+                                    .id(cursor.getInt(idColumnIndex))
+                                    .displayName(cursor.getString(displayNameColumnIndex))
+                                    .description(cursor.getString(descriptionColumnIndex))
+                                    .jrFormId(cursor.getString(jrFormIdColumnIndex))
+                                    .jrVersion(cursor.getString(jrVersionColumnIndex))
+                                    .formFilePath(cursor.getString(formFilePathColumnIndex))
+                                    .submissionUri(cursor.getString(submissionUriColumnIndex))
+                                    .base64RSAPublicKey(cursor.getString(base64RSAPublicKeyColumnIndex))
+                                    .displaySubtext(cursor.getString(displaySubtextColumnIndex))
+                                    .md5Hash(cursor.getString(md5HashColumnIndex))
+                                    .date(cursor.getLong(dateColumnIndex))
+                                    .jrCacheFilePath(cursor.getString(jrCacheFilePathColumnIndex))
+                                    .formMediaPath(cursor.getString(formMediaPathColumnIndex))
+                                    .language(cursor.getString(languageColumnIndex))
+                                    .autoSend(cursor.getString(autoSendColumnIndex))
+                                    .autoDelete(cursor.getString(autoDeleteColumnIndex))
+                                    .lastDetectedFormVersionHash(
+                                            cursor.getString(lastDetectedFormVersionHashColumnIndex))
+                                    .build();
 
                     forms.add(form);
                 }

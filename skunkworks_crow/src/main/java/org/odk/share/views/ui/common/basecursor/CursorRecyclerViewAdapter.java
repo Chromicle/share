@@ -3,14 +3,12 @@ package org.odk.share.views.ui.common.basecursor;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import org.odk.share.views.listeners.ItemClickListener;
 
-
-public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> extends RecyclerView.Adapter<T> {
+public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder>
+        extends RecyclerView.Adapter<T> {
 
     protected Context context;
     private Cursor cursor;
@@ -71,9 +69,8 @@ public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> 
     }
 
     /**
-     * Change the underlying cursor to a new cursor. If there is an existing cursor it will be
-     * closed.
-     */
+    * Change the underlying cursor to a new cursor. If there is an existing cursor it will be closed.
+    */
     public void changeCursor(Cursor cursor) {
         Cursor old = swapCursor(cursor);
         if (old != null) {
@@ -82,10 +79,9 @@ public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> 
     }
 
     /**
-     * Swap in a new Cursor, returning the old Cursor.  Unlike
-     * {@link #changeCursor(Cursor)}, the returned old Cursor is <em>not</em>
-     * closed.
-     */
+    * Swap in a new Cursor, returning the old Cursor. Unlike {@link #changeCursor(Cursor)}, the
+    * returned old Cursor is <em>not</em> closed.
+    */
     public Cursor swapCursor(Cursor newCursor) {
         if (newCursor == cursor) {
             return null;
@@ -106,7 +102,7 @@ public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> 
             rowIdColumn = -1;
             dataValid = false;
             notifyDataSetChanged();
-            //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
+            // There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
         }
         return oldCursor;
     }
@@ -125,7 +121,7 @@ public abstract class CursorRecyclerViewAdapter<T extends BaseCursorViewHolder> 
             super.onInvalidated();
             dataValid = false;
             notifyDataSetChanged();
-            //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
+            // There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
         }
     }
 }

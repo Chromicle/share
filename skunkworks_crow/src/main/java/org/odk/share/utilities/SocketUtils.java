@@ -2,18 +2,13 @@ package org.odk.share.utilities;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-
 import timber.log.Timber;
 
 public final class SocketUtils {
 
-    private SocketUtils() {
+    private SocketUtils() {}
 
-    }
-
-    /**
-     * @return port number that can be used for socket communication
-     */
+    /** @return port number that can be used for socket communication */
     public static int getPort() {
         int port = -1;
         try {
@@ -25,5 +20,4 @@ public final class SocketUtils {
         }
         return port;
     }
-
 }

@@ -1,65 +1,59 @@
 /*
- * Copyright (C) 2007 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright (C) 2007 The Android Open Source Project
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.odk.collect.android.provider;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-/**
- * Convenience definitions for NotePadProvider
- */
+/** Convenience definitions for NotePadProvider */
 public final class FormsProviderAPI {
     static final String AUTHORITY = "org.odk.collect.android.provider.odk.forms";
 
-    private FormsProviderAPI() {
-    }
+    private FormsProviderAPI() {}
 
-    /**
-     * Columns for the Forms table.
-     */
+    /** Columns for the Forms table. */
     public static final class FormsColumns implements BaseColumns {
-        private FormsColumns() {
-        }
+        private FormsColumns() {}
 
-        /**
-         * The content:// style URL for accessing Forms.
-         */
+        /** The content:// style URL for accessing Forms. */
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/forms");
 
         /**
-         * The content:// style URL for accessing the newest versions of Forms. For each
-         * {@link FormsColumns#JR_FORM_ID}, only the version with the most recent
-         * {@link FormsColumns#DATE} is included.
-         */
-        public static final Uri CONTENT_NEWEST_FORMS_BY_FORMID_URI = Uri.parse("content://" + AUTHORITY + "/newest_forms_by_form_id");
+        * The content:// style URL for accessing the newest versions of Forms. For each {@link
+        * FormsColumns#JR_FORM_ID}, only the version with the most recent {@link FormsColumns#DATE} is
+        * included.
+        */
+        public static final Uri CONTENT_NEWEST_FORMS_BY_FORMID_URI =
+                Uri.parse("content://" + AUTHORITY + "/newest_forms_by_form_id");
 
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.odk.form";
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.odk.form";
 
         // These are the only things needed for an insert
         public static final String DISPLAY_NAME = "displayName";
-        public static final String DESCRIPTION = "description";  // can be null
+        public static final String DESCRIPTION = "description"; // can be null
         public static final String JR_FORM_ID = "jrFormId";
         public static final String JR_VERSION = "jrVersion"; // can be null
         public static final String FORM_FILE_PATH = "formFilePath";
         public static final String SUBMISSION_URI = "submissionUri"; // can be null
         public static final String BASE64_RSA_PUBLIC_KEY = "base64RsaPublicKey"; // can be null
         public static final String AUTO_DELETE = "autoDelete"; // can be null
-        public static final String LAST_DETECTED_FORM_VERSION_HASH = "lastDetectedFormVersionHash"; // can be null
+        public static final String LAST_DETECTED_FORM_VERSION_HASH =
+                "lastDetectedFormVersionHash"; // can be null
         // Column is called autoSubmit for legacy support but the attribute is auto-send
         public static final String AUTO_SEND = "autoSubmit"; // can be null
 

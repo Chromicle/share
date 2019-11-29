@@ -6,39 +6,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
-import org.odk.share.R;
-import org.odk.share.dto.TransferInstance;
-import org.odk.share.views.listeners.OnItemClickListener;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import org.odk.share.R;
+import org.odk.share.dto.TransferInstance;
+import org.odk.share.views.listeners.OnItemClickListener;
 
-/**
- * Created by laksh on 6/30/2018.
- */
+/** Created by laksh on 6/30/2018. */
+public class TransferInstanceAdapter
+        extends RecyclerView.Adapter<TransferInstanceAdapter.ViewHolder> {
 
-public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstanceAdapter.ViewHolder> {
-
-    @Nullable
-    private final OnItemClickListener listener;
+    @Nullable private final OnItemClickListener listener;
     private final Context context;
     private final List<TransferInstance> items;
     private final LinkedHashSet<Long> selectedInstances;
     private final boolean showCheckBox;
 
-    public TransferInstanceAdapter(Context context, List<TransferInstance> objects,
-                                   @Nullable OnItemClickListener listener,
-                                   LinkedHashSet<Long> selectedInstances, boolean showCheckBox) {
+    public TransferInstanceAdapter(
+            Context context,
+            List<TransferInstance> objects,
+            @Nullable OnItemClickListener listener,
+            LinkedHashSet<Long> selectedInstances,
+            boolean showCheckBox) {
         this.context = context;
         items = objects;
         this.listener = listener;
@@ -49,7 +46,8 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View viewHolder = LayoutInflater.from(context).inflate(R.layout.list_item_checkbox, parent, false);
+        View viewHolder =
+                LayoutInflater.from(context).inflate(R.layout.list_item_checkbox, parent, false);
         return new ViewHolder(viewHolder);
     }
 
@@ -71,17 +69,20 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         }
 
         Date date = new Date(instance.getLastStatusChangeDate());
-        SimpleDateFormat dateFormat = new SimpleDateFormat(context.getString(R.string.date_at_time),
-                Locale.getDefault());
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat(context.getString(R.string.date_at_time), Locale.getDefault());
         String statusChangeTime = dateFormat.format(date);
 
         if (instance.getTransferStatus().equalsIgnoreCase(context.getString(R.string.sent))) {
-            if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED ||
-                    instance.getReceivedReviewStatus() == TransferInstance.STATUS_REJECTED) {
+            if (instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED
+                    || instance.getReceivedReviewStatus() == TransferInstance.STATUS_REJECTED) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(context.getString(R.string.form_received_by_reviewer,
-                        instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED ?
-                                context.getString(R.string.accepted) : context.getString(R.string.rejected)));
+                sb.append(
+                        context.getString(
+                                R.string.form_received_by_reviewer,
+                                instance.getReceivedReviewStatus() == TransferInstance.STATUS_ACCEPTED
+                                        ? context.getString(R.string.accepted)
+                                        : context.getString(R.string.rejected)));
                 if (instance.getInstructions() != null && instance.getInstructions().length() > 0) {
                     sb.append(context.getString(R.string.feedback_sent, instance.getInstructions()));
                 } else {
@@ -98,7 +99,6 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
         } else {
             holder.subtitle.setText(context.getString(R.string.received_on, statusChangeTime));
         }
-
     }
 
     @Override
@@ -110,8 +110,10 @@ public class TransferInstanceAdapter extends RecyclerView.Adapter<TransferInstan
 
         @BindView(R.id.tvTitle)
         TextView title;
+
         @BindView(R.id.tvSubtitle)
         TextView subtitle;
+
         @BindView(R.id.checkbox)
         CheckBox checkBox;
 

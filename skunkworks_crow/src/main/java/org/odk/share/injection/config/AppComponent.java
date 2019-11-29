@@ -1,7 +1,10 @@
 package org.odk.share.injection.config;
 
 import android.app.Application;
-
+import dagger.BindsInstance;
+import dagger.Component;
+import dagger.android.AndroidInjector;
+import dagger.android.support.AndroidSupportInjectionModule;
 import org.odk.share.application.Share;
 import org.odk.share.injection.ActivityBuilder;
 import org.odk.share.injection.FragmentBuilder;
@@ -10,25 +13,19 @@ import org.odk.share.services.HotspotService;
 import org.odk.share.tasks.DownloadJob;
 import org.odk.share.tasks.UploadJob;
 
-import dagger.BindsInstance;
-import dagger.Component;
-import dagger.android.AndroidInjector;
-import dagger.android.support.AndroidSupportInjectionModule;
-
 /**
- * Primary module, bootstraps the injection system and
- * injects the main Share instance here.
- * <p>
- * Shouldn't be modified unless absolutely necessary.
- */
-
+* Primary module, bootstraps the injection system and injects the main Share instance here.
+*
+* <p>Shouldn't be modified unless absolutely necessary.
+*/
 @PerApplication
-@Component(modules = {
-        AndroidSupportInjectionModule.class,
-        AppModule.class,
-        ActivityBuilder.class,
-        FragmentBuilder.class
-})
+@Component(
+        modules = {
+            AndroidSupportInjectionModule.class,
+            AppModule.class,
+            ActivityBuilder.class,
+            FragmentBuilder.class
+        })
 public interface AppComponent extends AndroidInjector<Share> {
 
     void inject(Share share);

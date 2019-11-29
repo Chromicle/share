@@ -1,5 +1,10 @@
 package org.odk.share.views.ui.bluetooth;
 
+import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
+import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -19,12 +24,15 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import javax.inject.Inject;
 import org.odk.share.R;
 import org.odk.share.bluetooth.BluetoothUtils;
 import org.odk.share.events.BluetoothEvent;
@@ -36,31 +44,17 @@ import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 import org.odk.share.views.ui.hotspot.HpSenderActivity;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
 import timber.log.Timber;
 
-import static org.odk.share.utilities.ApplicationConstants.ASK_REVIEW_MODE;
-import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
-import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
-import static org.odk.share.views.ui.send.fragment.BlankFormsFragment.FORM_IDS;
-
-
 /**
- * Bluetooth sender activity.
- *
- * @author huangyz0918 (huangyz0918@gmail.com)
- */
+* Bluetooth sender activity.
+*
+* @author huangyz0918 (huangyz0918@gmail.com)
+*/
 @RuntimePermissions
 public class BtSenderActivity extends InjectableActivity {
 
@@ -73,14 +67,11 @@ public class BtSenderActivity extends InjectableActivity {
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
-    @Inject
-    RxEventBus rxEventBus;
+    @Inject RxEventBus rxEventBus;
 
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Inject BaseSchedulerProvider schedulerProvider;
 
-    @Inject
-    SenderService senderService;
+    @Inject SenderService senderService;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isFinished = false;
@@ -98,7 +89,6 @@ public class BtSenderActivity extends InjectableActivity {
 
     private long[] formIds;
     private int mode;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,125 +127,143 @@ public class BtSenderActivity extends InjectableActivity {
     }
 
     private void setupDialog() {
-        //ProgressDialog
+        // ProgressDialog
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(getString(R.string.sending_title));
         progressDialog.setIndeterminate(true);
-        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop),
+        progressDialog.setButton(
+                DialogInterface.BUTTON_NEGATIVE,
+                getString(R.string.stop),
                 (DialogInterface dialog, int which) -> {
                     dialog.dismiss();
                     senderService.cancel();
                     finish();
                 });
 
-        //AlertDialog
-        resultDialog = new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.transfer_result))
-                .setCancelable(false)
-                .setNegativeButton(getString(R.string.ok), (DialogInterface dialog, int which) -> {
-                    dialog.dismiss();
-                    senderService.cancel();
-                    if (BluetoothUtils.isBluetoothEnabled() && initialStateDisabled) {
-                        BluetoothUtils.disableBluetooth();
-                    }
-                    finish();
-                })
-                .create();
+        // AlertDialog
+        resultDialog =
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.transfer_result))
+                        .setCancelable(false)
+                        .setNegativeButton(
+                                getString(R.string.ok),
+                                (DialogInterface dialog, int which) -> {
+                                    dialog.dismiss();
+                                    senderService.cancel();
+                                    if (BluetoothUtils.isBluetoothEnabled() && initialStateDisabled) {
+                                        BluetoothUtils.disableBluetooth();
+                                    }
+                                    finish();
+                                })
+                        .create();
     }
 
-    /**
-     * Create the switch method button in the menu.
-     */
+    /** Create the switch method button in the menu. */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.switch_method_menu, menu);
         final MenuItem switchItem = menu.findItem(R.id.menu_switch);
-        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
-            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
-                receivedIntent.setClass(this, HpSenderActivity.class);
-                senderService.cancel();
-                if (BluetoothUtils.isBluetoothEnabled() && initialStateDisabled) {
-                    BluetoothUtils.disableBluetooth();
-                }
-                startActivity(receivedIntent);
-                finish();
-            }).show();
-            return true;
-        });
+        switchItem.setOnMenuItemClickListener(
+                (MenuItem item) -> {
+                    DialogUtils.createMethodSwitchDialog(
+                                    this,
+                                    (DialogInterface dialog, int which) -> {
+                                        receivedIntent.setClass(this, HpSenderActivity.class);
+                                        senderService.cancel();
+                                        if (BluetoothUtils.isBluetoothEnabled() && initialStateDisabled) {
+                                            BluetoothUtils.disableBluetooth();
+                                        }
+                                        startActivity(receivedIntent);
+                                        finish();
+                                    })
+                            .show();
+                    return true;
+                });
 
         return super.onCreateOptionsMenu(menu);
     }
 
     /**
-     * Creates a subscription for listening to all hotspot events being send through the
-     * application's {@link RxEventBus}
-     */
+    * Creates a subscription for listening to all hotspot events being send through the application's
+    * {@link RxEventBus}
+    */
     private Disposable addBluetoothEventSubscription() {
-        return rxEventBus.register(BluetoothEvent.class)
+        return rxEventBus
+                .register(BluetoothEvent.class)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.androidThread())
-                .subscribe(bluetoothEvent -> {
-                    switch (bluetoothEvent.getStatus()) {
-                        case CONNECTED:
-                            countDownTimer.cancel();
-                            progressDialog.setMessage(getString(R.string.connecting_transfer_message));
-                            progressDialog.show();
-                            activityTextView.setVisibility(View.GONE);
-                            break;
-                        case DISCONNECTED:
-                            progressDialog.dismiss();
-                            break;
-                    }
-                });
+                .subscribe(
+                        bluetoothEvent -> {
+                            switch (bluetoothEvent.getStatus()) {
+                                case CONNECTED:
+                                    countDownTimer.cancel();
+                                    progressDialog.setMessage(getString(R.string.connecting_transfer_message));
+                                    progressDialog.show();
+                                    activityTextView.setVisibility(View.GONE);
+                                    break;
+                                case DISCONNECTED:
+                                    progressDialog.dismiss();
+                                    break;
+                            }
+                        });
     }
 
     private Disposable addUploadEventSubscription() {
-        return rxEventBus.register(UploadEvent.class)
+        return rxEventBus
+                .register(UploadEvent.class)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.androidThread())
-                .subscribe(uploadEvent -> {
-                    switch (uploadEvent.getStatus()) {
-                        case QUEUED:
-                            isFinished = false;
-                            Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
-                            break;
-                        case UPLOADING:
-                            int progress = uploadEvent.getCurrentProgress();
-                            int total = uploadEvent.getTotalSize();
-                            String alertMsg = getString(R.string.sending_items, String.valueOf(progress), String.valueOf(total));
-                            progressDialog.setMessage(alertMsg);
-                            break;
-                        case FINISHED:
-                            progressDialog.dismiss();
-                            isFinished = true;
-                            progressBar.setVisibility(View.GONE);
-                            String result = uploadEvent.getResult();
-                            resultDialog.setMessage(result);
-                            resultDialog.show();
-                            break;
-                        case ERROR:
-                            progressBar.setVisibility(View.GONE);
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
+                .subscribe(
+                        uploadEvent -> {
+                            switch (uploadEvent.getStatus()) {
+                                case QUEUED:
+                                    isFinished = false;
+                                    Toast.makeText(this, R.string.upload_queued, Toast.LENGTH_SHORT).show();
+                                    break;
+                                case UPLOADING:
+                                    int progress = uploadEvent.getCurrentProgress();
+                                    int total = uploadEvent.getTotalSize();
+                                    String alertMsg =
+                                            getString(
+                                                    R.string.sending_items, String.valueOf(progress), String.valueOf(total));
+                                    progressDialog.setMessage(alertMsg);
+                                    break;
+                                case FINISHED:
+                                    progressDialog.dismiss();
+                                    isFinished = true;
+                                    progressBar.setVisibility(View.GONE);
+                                    String result = uploadEvent.getResult();
+                                    resultDialog.setMessage(result);
+                                    resultDialog.show();
+                                    break;
+                                case ERROR:
+                                    progressBar.setVisibility(View.GONE);
+                                    if (progressDialog != null && progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+                                    Toast.makeText(
+                                                    this,
+                                                    getString(R.string.error_while_uploading, uploadEvent.getResult()),
+                                                    Toast.LENGTH_SHORT)
+                                            .show();
+                                    break;
+                                case CANCELLED:
+                                    progressBar.setVisibility(View.GONE);
+                                    if (progressDialog != null && progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+                                    Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+                                    break;
                             }
-                            Toast.makeText(this, getString(R.string.error_while_uploading, uploadEvent.getResult()), Toast.LENGTH_SHORT).show();
-                            break;
-                        case CANCELLED:
-                            progressBar.setVisibility(View.GONE);
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-                            break;
-                    }
-                }, Timber::e);
+                        },
+                        Timber::e);
     }
 
-    /**
-     * Enable the bluetooth discovery for other devices. The timeout is specific seconds.
-     */
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION})
+    /** Enable the bluetooth discovery for other devices. The timeout is specific seconds. */
+    @NeedsPermission({
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    })
     void enableDiscovery() {
         if (BluetoothUtils.isBluetoothEnabled()) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -265,41 +273,49 @@ public class BtSenderActivity extends InjectableActivity {
         }
     }
 
-    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-                if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                        == BluetoothAdapter.STATE_ON && !isDiscovering) {
-                    BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(BtSenderActivity.this);
+    private final BroadcastReceiver bluetoothReceiver =
+            new BroadcastReceiver() {
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
+                    if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                        if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_ON
+                                && !isDiscovering) {
+                            BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(
+                                    BtSenderActivity.this);
+                        }
+                    }
                 }
-            }
-        }
-    };
+            };
 
-    /**
-     * If the permission was denied, finishing this activity.
-     */
-    @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION})
+    /** If the permission was denied, finishing this activity. */
+    @OnPermissionDenied({
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    })
     void showDeniedForLocation() {
         Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_LONG).show();
         finish();
     }
 
-    /**
-     * If clicked the "never ask", we should show a toast to guide user.
-     */
-    @OnNeverAskAgain({Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION})
+    /** If clicked the "never ask", we should show a toast to guide user. */
+    @OnNeverAskAgain({
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    })
     void showNeverAskForLocation() {
-        PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_location_info), getString(R.string.permission_location_denied));
+        PermissionUtils.showAppInfo(
+                this,
+                getPackageName(),
+                getString(R.string.permission_open_location_info),
+                getString(R.string.permission_location_denied));
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        BtSenderActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+        BtSenderActivityPermissionsDispatcher.onRequestPermissionsResult(
+                this, requestCode, grantResults);
     }
 
     @Override
@@ -318,7 +334,11 @@ public class BtSenderActivity extends InjectableActivity {
             case APP_SETTING_REQUEST_CODE:
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_location_info), getString(R.string.permission_location_denied));
+                    PermissionUtils.showAppInfo(
+                            this,
+                            getPackageName(),
+                            getString(R.string.permission_open_location_info),
+                            getString(R.string.permission_location_denied));
                 } else {
                     BtSenderActivityPermissionsDispatcher.enableDiscoveryWithPermissionCheck(this);
                 }
@@ -327,36 +347,42 @@ public class BtSenderActivity extends InjectableActivity {
     }
 
     /**
-     * Checking the discoverable time, if the device is no longer discoverable, we should show
-     * an {@link AlertDialog} to notice our users.
-     */
+    * Checking the discoverable time, if the device is no longer discoverable, we should show an
+    * {@link AlertDialog} to notice our users.
+    */
     private void startCheckingDiscoverableDuration() {
         senderService.startUploading(formIds, mode);
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.timeout))
-                .setMessage(getString(R.string.bluetooth_send_time_up))
-                .setCancelable(false)
-                .setNegativeButton(R.string.quit, (DialogInterface dialog, int which) -> {
-                    finish();
-                })
-                .create();
+        AlertDialog alertDialog =
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.timeout))
+                        .setMessage(getString(R.string.bluetooth_send_time_up))
+                        .setCancelable(false)
+                        .setNegativeButton(
+                                R.string.quit,
+                                (DialogInterface dialog, int which) -> {
+                                    finish();
+                                })
+                        .create();
 
         activityTextView.setText(getString(R.string.tv_sender_wait_for_connect));
-        countDownTimer = new CountDownTimer(CONNECT_TIMEOUT * COUNT_DOWN_INTERVAL, COUNT_DOWN_INTERVAL) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                activityTextView.setText(String.format(getString(R.string.tv_sender_wait_for_connect),
-                        String.valueOf(millisUntilFinished / COUNT_DOWN_INTERVAL)));
-            }
+        countDownTimer =
+                new CountDownTimer(CONNECT_TIMEOUT * COUNT_DOWN_INTERVAL, COUNT_DOWN_INTERVAL) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        activityTextView.setText(
+                                String.format(
+                                        getString(R.string.tv_sender_wait_for_connect),
+                                        String.valueOf(millisUntilFinished / COUNT_DOWN_INTERVAL)));
+                    }
 
-            @Override
-            public void onFinish() {
-                isDiscovering = false;
-                if (!(BtSenderActivity.this).isFinishing()) {
-                    alertDialog.show();
-                }
-            }
-        }.start();
+                    @Override
+                    public void onFinish() {
+                        isDiscovering = false;
+                        if (!(BtSenderActivity.this).isFinishing()) {
+                            alertDialog.show();
+                        }
+                    }
+                }.start();
     }
 
     @Override
@@ -384,32 +410,40 @@ public class BtSenderActivity extends InjectableActivity {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.stop_sending))
                     .setMessage(getString(R.string.stop_sending_msg))
-                    .setPositiveButton(R.string.stop, (DialogInterface dialog, int which) -> {
-                        senderService.cancel();
-                        if (initialStateDisabled) {
-                            BluetoothUtils.disableBluetooth();
-                        }
-                        super.onBackPressed();
-                    })
-                    .setNegativeButton(R.string.cancel, (DialogInterface dialog, int which) -> {
-                        dialog.dismiss();
-                    })
+                    .setPositiveButton(
+                            R.string.stop,
+                            (DialogInterface dialog, int which) -> {
+                                senderService.cancel();
+                                if (initialStateDisabled) {
+                                    BluetoothUtils.disableBluetooth();
+                                }
+                                super.onBackPressed();
+                            })
+                    .setNegativeButton(
+                            R.string.cancel,
+                            (DialogInterface dialog, int which) -> {
+                                dialog.dismiss();
+                            })
                     .create()
                     .show();
         } else {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.disable_bluetooth))
                     .setMessage(getString(R.string.disable_bluetooth_sender_msg))
-                    .setPositiveButton(R.string.quit, (DialogInterface dialog, int which) -> {
-                        senderService.cancel();
-                        if (initialStateDisabled) {
-                            BluetoothUtils.disableBluetooth();
-                        }
-                        super.onBackPressed();
-                    })
-                    .setNegativeButton(android.R.string.no, (DialogInterface dialog, int which) -> {
-                        dialog.dismiss();
-                    })
+                    .setPositiveButton(
+                            R.string.quit,
+                            (DialogInterface dialog, int which) -> {
+                                senderService.cancel();
+                                if (initialStateDisabled) {
+                                    BluetoothUtils.disableBluetooth();
+                                }
+                                super.onBackPressed();
+                            })
+                    .setNegativeButton(
+                            android.R.string.no,
+                            (DialogInterface dialog, int which) -> {
+                                dialog.dismiss();
+                            })
                     .create()
                     .show();
         }

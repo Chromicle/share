@@ -1,5 +1,8 @@
 package org.odk.share.activities;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.robolectric.Shadows.shadowOf;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,9 +10,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-
 import androidx.appcompat.widget.Toolbar;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,10 +28,6 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.robolectric.Shadows.shadowOf;
-
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
 
@@ -41,26 +38,20 @@ public class MainActivityTest {
         mainActivity = Robolectric.setupActivity(MainActivity.class);
     }
 
-    /**
-     * {@link Test} to assert {@link MainActivity} for not null.
-     */
+    /** {@link Test} to assert {@link MainActivity} for not null. */
     @Test
     public void shouldNotBeNull() {
         assertNotNull(mainActivity);
     }
 
-    /**
-     * {@link Test} to assert title of {@link MainActivity} for not null.
-     */
+    /** {@link Test} to assert title of {@link MainActivity} for not null. */
     @Test
     public void titleTest() throws Exception {
         Toolbar toolbar = mainActivity.findViewById(R.id.toolbar);
         assertEquals(mainActivity.getString(R.string.app_name), toolbar.getTitle());
     }
 
-    /**
-     * {@link Test} to assert receiveButton's functioning.
-     */
+    /** {@link Test} to assert receiveButton's functioning. */
     @Test
     public void receiveButtonTest() throws Exception {
         Button receiveButton = mainActivity.findViewById(R.id.bReceiveForms);
@@ -71,8 +62,12 @@ public class MainActivityTest {
 
         receiveButton.performClick();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
-        String defaultMethod = prefs.getString(PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD, mainActivity.getString(R.string.default_hotspot_ssid));
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+        String defaultMethod =
+                prefs.getString(
+                        PreferenceKeys.KEY_DEFAULT_TRANSFER_METHOD,
+                        mainActivity.getString(R.string.default_hotspot_ssid));
         if (mainActivity.getString(R.string.default_hotspot_ssid).equals(defaultMethod)) {
             Intent expectedHotspotIntent = new Intent(mainActivity, HpReceiverActivity.class);
             Intent hotspotActual = shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
@@ -84,9 +79,7 @@ public class MainActivityTest {
         }
     }
 
-    /**
-     * {@link Test} to assert sendButton's functioning.
-     */
+    /** {@link Test} to assert sendButton's functioning. */
     @Test
     public void sendButtonTest() throws Exception {
         Button sendButton = mainActivity.findViewById(R.id.bSendForms);
@@ -99,38 +92,35 @@ public class MainActivityTest {
         ShadowActivity shadowActivity = shadowOf(mainActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = shadowOf(startedIntent);
-        assertEquals(SendFormsActivity.class.getName(),
-                shadowIntent.getIntentClass().getName());
+        assertEquals(SendFormsActivity.class.getName(), shadowIntent.getIntentClass().getName());
     }
 
-    /**
-     * {@link Test} to assert Options Menu's functioning.
-     */
+    /** {@link Test} to assert Options Menu's functioning. */
     @Test
     public void optionsMenuTest() throws Exception {
         Menu menu = shadowOf(mainActivity).getOptionsMenu();
         assertNotNull(menu);
 
-        //Test for SettingsActivity
+        // Test for SettingsActivity
         mainActivity.onOptionsItemSelected(menu.getItem(0));
         ShadowActivity shadowActivity = shadowOf(mainActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = shadowOf(startedIntent);
         assertEquals(SettingsActivity.class.getName(), shadowIntent.getIntentClass().getName());
 
-        //Test for Settings Menu Title
+        // Test for Settings Menu Title
         String menuTitle = mainActivity.getResources().getString(R.string.settings);
         String shadowTitle = menu.getItem(0).getTitle().toString();
         assertEquals(shadowTitle, menuTitle);
 
-        //Test for AboutActivity
+        // Test for AboutActivity
         mainActivity.onOptionsItemSelected(menu.getItem(1));
         shadowActivity = shadowOf(mainActivity);
         startedIntent = shadowActivity.getNextStartedActivity();
         shadowIntent = shadowOf(startedIntent);
         assertEquals(AboutActivity.class.getName(), shadowIntent.getIntentClass().getName());
 
-        //Test for About Menu Title
+        // Test for About Menu Title
         menuTitle = mainActivity.getResources().getString(R.string.about);
         shadowTitle = menu.getItem(1).getTitle().toString();
         assertEquals(shadowTitle, menuTitle);

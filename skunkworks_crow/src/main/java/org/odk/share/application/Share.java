@@ -2,29 +2,21 @@ package org.odk.share.application;
 
 import android.content.Context;
 import android.os.Environment;
-
 import androidx.annotation.IntDef;
-
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobManagerCreateException;
-
+import dagger.android.AndroidInjector;
+import dagger.android.DaggerApplication;
+import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import org.odk.share.R;
 import org.odk.share.injection.config.AppComponent;
 import org.odk.share.injection.config.DaggerAppComponent;
 import org.odk.share.tasks.ShareJobCreator;
-
-import java.io.File;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import dagger.android.AndroidInjector;
-import dagger.android.DaggerApplication;
 import timber.log.Timber;
 
-/**
- * Created by laksh on 5/19/2018.
- */
-
+/** Created by laksh on 5/19/2018. */
 public class Share extends DaggerApplication {
 
     // define the different methods for data transferring.
@@ -35,22 +27,25 @@ public class Share extends DaggerApplication {
         int HOTSPOT = 0x110;
     }
 
-    public static final String ODK_ROOT = Environment.getExternalStorageDirectory() + File.separator + "share";
-    public static final String ODK_COLLECT_ROOT = Environment.getExternalStorageDirectory() + File.separator + "odk";
+    public static final String ODK_ROOT =
+            Environment.getExternalStorageDirectory() + File.separator + "share";
+    public static final String ODK_COLLECT_ROOT =
+            Environment.getExternalStorageDirectory() + File.separator + "odk";
     public static final String FORMS_DIR_NAME = "forms";
     public static final String INSTANCES_DIR_NAME = "instances";
     public static final String METADATA_DIR_NAME = "metadata";
     public static final String FORMS_PATH = ODK_COLLECT_ROOT + File.separator + FORMS_DIR_NAME;
-    public static final String INSTANCES_PATH = ODK_COLLECT_ROOT + File.separator + INSTANCES_DIR_NAME;
+    public static final String INSTANCES_PATH =
+            ODK_COLLECT_ROOT + File.separator + INSTANCES_DIR_NAME;
     public static final String METADATA_PATH = ODK_ROOT + File.separator + METADATA_DIR_NAME;
 
     private AppComponent appComponent;
 
     /**
-     * Creates required directories on the SDCard (or other external storage)
-     *
-     * @throws RuntimeException if there is no SDCard or the directory exists as a non directory
-     */
+    * Creates required directories on the SDCard (or other external storage)
+    *
+    * @throws RuntimeException if there is no SDCard or the directory exists as a non directory
+    */
     public static void createODKDirs(Context context) throws RuntimeException {
         String cardstatus = Environment.getExternalStorageState();
 

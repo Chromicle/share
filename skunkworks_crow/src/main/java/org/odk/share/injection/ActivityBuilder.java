@@ -1,18 +1,17 @@
 package org.odk.share.injection;
 
+import dagger.Module;
+import dagger.android.ContributesAndroidInjector;
+import org.odk.share.injection.config.scopes.PerActivity;
 import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.bluetooth.BtSenderActivity;
+import org.odk.share.views.ui.hotspot.HpReceiverActivity;
+import org.odk.share.views.ui.hotspot.HpSenderActivity;
 import org.odk.share.views.ui.instance.InstanceManagerTabs;
 import org.odk.share.views.ui.instance.InstancesList;
 import org.odk.share.views.ui.main.MainActivity;
-import org.odk.share.views.ui.hotspot.HpReceiverActivity;
 import org.odk.share.views.ui.review.ReviewFormActivity;
-import org.odk.share.views.ui.hotspot.HpSenderActivity;
 import org.odk.share.views.ui.send.SendFormsActivity;
-import org.odk.share.injection.config.scopes.PerActivity;
-
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
 
 @Module
 public abstract class ActivityBuilder {

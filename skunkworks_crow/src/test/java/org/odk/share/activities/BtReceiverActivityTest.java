@@ -1,13 +1,16 @@
 package org.odk.share.activities;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
-
 import androidx.appcompat.widget.Toolbar;
-
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,13 +21,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLog;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class BtReceiverActivityTest {
@@ -40,46 +36,42 @@ public class BtReceiverActivityTest {
         btReceiverActivity = Robolectric.setupActivity(BtReceiverActivity.class);
     }
 
-    /**
-     * {@link Test} to assert {@link BtReceiverActivity} for not null.
-     */
+    /** {@link Test} to assert {@link BtReceiverActivity} for not null. */
     @Test
     public void shouldNotBeNull() {
         assertNotNull(btReceiverActivity);
     }
 
-    /**
-     * {@link Test} to assert title of {@link BtReceiverActivity} for not null.
-     */
+    /** {@link Test} to assert title of {@link BtReceiverActivity} for not null. */
     @Test
     public void titleTest() throws Exception {
         Toolbar toolbar = btReceiverActivity.findViewById(R.id.toolbar);
-        assertEquals(" " + btReceiverActivity.getString(R.string.connect_bluetooth_title), toolbar.getTitle());
+        assertEquals(
+                " " + btReceiverActivity.getString(R.string.connect_bluetooth_title), toolbar.getTitle());
     }
 
-    /**
-     * {@link Test} the {@link BluetoothReceiver} is correctly load in our tests.
-     */
+    /** {@link Test} the {@link BluetoothReceiver} is correctly load in our tests. */
     @Test
     public void testBroadcastReceiverRegistered() {
-        List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
+        List<ShadowApplication.Wrapper> registeredReceivers =
+                ShadowApplication.getInstance().getRegisteredReceivers();
 
         assertFalse(registeredReceivers.isEmpty());
 
         boolean receiverFound = false;
         for (ShadowApplication.Wrapper wrapper : registeredReceivers) {
             if (!receiverFound) {
-                receiverFound = BluetoothReceiver.class.getSimpleName().equals(
-                        wrapper.broadcastReceiver.getClass().getSimpleName());
+                receiverFound =
+                        BluetoothReceiver.class
+                                .getSimpleName()
+                                .equals(wrapper.broadcastReceiver.getClass().getSimpleName());
             }
         }
 
-        assertTrue(receiverFound); //will be false if not found
+        assertTrue(receiverFound); // will be false if not found
     }
 
-    /**
-     * {@link Test} to check if we have receivers listening to the defined action.
-     */
+    /** {@link Test} to check if we have receivers listening to the defined action. */
     @Test
     public void testIntentHandling() {
         ShadowApplication shadowApplication = ShadowApplication.getInstance();

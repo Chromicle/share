@@ -1,5 +1,9 @@
 package org.odk.share.views.ui.instance.fragment;
 
+import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
+import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
+import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
+
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,65 +11,52 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.dto.Instance;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.share.R;
-import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.dto.TransferInstance;
-import org.odk.share.views.ui.common.InstanceListFragment;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import javax.inject.Inject;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.dto.Instance;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.share.R;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.dto.TransferInstance;
+import org.odk.share.views.ui.common.InstanceListFragment;
+import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
 
-import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
-import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
-import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
-
-/**
- * Created by laksh on 6/27/2018.
- */
-
+/** Created by laksh on 6/27/2018. */
 public class SentInstancesFragment extends InstanceListFragment {
 
     private static final String SENT_INSTANCE_LIST_SORTING_ORDER = "sentInstanceListSortingOrder";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+
     @BindView(R.id.empty_view)
     TextView emptyView;
+
     @BindView(R.id.buttonholder)
     LinearLayout buttonLayout;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
-    @Inject
-    TransferDao transferDao;
+    @Inject TransferDao transferDao;
 
     HashMap<Long, Instance> instanceMap;
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
 
-    public SentInstancesFragment() {
-
-    }
+    public SentInstancesFragment() {}
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
         ButterKnife.bind(this, view);
@@ -80,7 +71,6 @@ public class SentInstancesFragment extends InstanceListFragment {
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
-
         setupAdapter();
         return view;
     }
@@ -88,8 +78,9 @@ public class SentInstancesFragment extends InstanceListFragment {
     @Override
     public void onResume() {
         getInstanceFromDB();
-        setEmptyViewVisibility(getString(R.string.no_forms_sent,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        setEmptyViewVisibility(
+                getString(
+                        R.string.no_forms_sent, getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
         super.onResume();
     }
@@ -97,8 +88,9 @@ public class SentInstancesFragment extends InstanceListFragment {
     @Override
     protected void updateAdapter() {
         getInstanceFromDB();
-        setEmptyViewVisibility(getString(R.string.no_forms_sent,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        setEmptyViewVisibility(
+                getString(
+                        R.string.no_forms_sent, getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
     }
 
@@ -116,26 +108,33 @@ public class SentInstancesFragment extends InstanceListFragment {
         String selection;
 
         if (formVersion == null) {
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
+            selection =
+                    InstanceProviderAPI.InstanceColumns.JR_FORM_ID
+                            + "=? AND "
+                            + InstanceProviderAPI.InstanceColumns.JR_VERSION
+                            + " IS NULL";
             if (getFilterText().length() == 0) {
-                selectionArgs = new String[]{formId};
+                selectionArgs = new String[] {formId};
             } else {
-                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
+                selectionArgs = new String[] {formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         } else {
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
+            selection =
+                    InstanceProviderAPI.InstanceColumns.JR_FORM_ID
+                            + "=? AND "
+                            + InstanceProviderAPI.InstanceColumns.JR_VERSION
+                            + "=?";
             if (getFilterText().length() == 0) {
-                selectionArgs = new String[]{formId, formVersion};
+                selectionArgs = new String[] {formId, formVersion};
             } else {
-                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
+                selectionArgs = new String[] {formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         }
 
-        Cursor cursor = instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
+        Cursor cursor =
+                instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
         instanceMap = instancesDao.getMapFromCursor(cursor);
 
         Cursor transferCursor = transferDao.getSentInstancesCursor();
@@ -149,8 +148,9 @@ public class SentInstancesFragment extends InstanceListFragment {
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList,
-                null, selectedInstances, false);
+        transferInstanceAdapter =
+                new TransferInstanceAdapter(
+                        getActivity(), transferInstanceList, null, selectedInstances, false);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 

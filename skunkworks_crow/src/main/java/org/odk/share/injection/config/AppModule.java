@@ -1,9 +1,9 @@
 package org.odk.share.injection.config;
 
-
 import android.app.Application;
 import android.content.Context;
-
+import dagger.Module;
+import dagger.Provides;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.share.dao.InstanceMapDao;
@@ -16,17 +16,14 @@ import org.odk.share.rx.schedulers.SchedulerProvider;
 import org.odk.share.services.ReceiverService;
 import org.odk.share.services.SenderService;
 
-import dagger.Module;
-import dagger.Provides;
-
 /**
- * Add Application level providers here, i.e. if you want to
- * inject something into the Share instance.
- */
+* Add Application level providers here, i.e. if you want to inject something into the Share
+* instance.
+*/
 @Module
 class AppModule {
 
-    //expose Application as an injectable context
+    // expose Application as an injectable context
 
     @Provides
     Context bindContext(Application application) {
@@ -46,13 +43,15 @@ class AppModule {
 
     @Provides
     @PerApplication
-    ReceiverService provideReceiverService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
+    ReceiverService provideReceiverService(
+            RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
         return new ReceiverService(rxEventBus, schedulerProvider);
     }
 
     @Provides
     @PerApplication
-    SenderService provideSenderService(RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
+    SenderService provideSenderService(
+            RxEventBus rxEventBus, BaseSchedulerProvider schedulerProvider) {
         return new SenderService(rxEventBus, schedulerProvider);
     }
 

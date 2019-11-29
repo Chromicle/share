@@ -1,11 +1,8 @@
 package org.odk.share.views.ui.common.basecursor;
 
 import android.view.View;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import org.odk.share.views.listeners.ItemClickListener;
-
 
 public class BaseCursorViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 

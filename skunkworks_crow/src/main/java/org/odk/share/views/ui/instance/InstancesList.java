@@ -1,19 +1,24 @@
 package org.odk.share.views.ui.instance;
 
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import java.util.LinkedHashSet;
+import javax.inject.Inject;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
@@ -22,28 +27,23 @@ import org.odk.share.utilities.ArrayUtils;
 import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.ui.instance.adapter.InstanceAdapter;
 
-import java.util.LinkedHashSet;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
-
-public class InstancesList extends InstanceListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class InstancesList extends InstanceListActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.send_button)
     Button sendButton;
+
     @BindView(R.id.toggle_button)
     Button toggleButton;
 
-    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER = "instanceListActivitySortingOrder";
+    private static final String INSTANCE_LIST_ACTIVITY_SORTING_ORDER =
+            "instanceListActivitySortingOrder";
 
     public static final String INSTANCE_IDS = "instance_ids";
 
@@ -51,8 +51,7 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
     private InstanceAdapter instanceAdapter;
     private LinkedHashSet<Long> selectedInstances;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +93,8 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
         }
     }
 
-
     @Override
-    public void onLoaderReset(@NonNull Loader loader) {
-    }
+    public void onLoaderReset(@NonNull Loader loader) {}
 
     private void onListItemClick(View view, int position) {
         Cursor cursor = instanceAdapter.getCursor();
@@ -139,7 +136,8 @@ public class InstancesList extends InstanceListActivity implements LoaderManager
             Cursor cursor = instanceAdapter.getCursor();
             if (cursor.moveToFirst()) {
                 do {
-                    selectedInstances.add(cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
+                    selectedInstances.add(
+                            cursor.getLong(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                 } while (cursor.moveToNext());
             }
         } else {

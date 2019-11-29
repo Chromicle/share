@@ -1,20 +1,20 @@
 package org.odk.share.services;
 
 /*
- * Copyright 2017 Srihari Yachamaneni
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2017 Srihari Yachamaneni
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -27,22 +27,17 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-
+import io.reactivex.disposables.CompositeDisposable;
+import javax.inject.Inject;
 import org.odk.share.R;
-import org.odk.share.views.ui.main.MainActivity;
 import org.odk.share.application.Share;
 import org.odk.share.events.HotspotEvent;
 import org.odk.share.network.WifiHospotConnector;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
-
-import javax.inject.Inject;
-
-import io.reactivex.disposables.CompositeDisposable;
-
+import org.odk.share.views.ui.main.MainActivity;
 
 public class HotspotService extends Service {
 
@@ -56,14 +51,11 @@ public class HotspotService extends Service {
     private static final int STATUS = 2;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    @Inject
-    RxEventBus rxEventBus;
+    @Inject RxEventBus rxEventBus;
 
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Inject BaseSchedulerProvider schedulerProvider;
 
-    @Inject
-    WifiHospotConnector wifiHospotConnector;
+    @Inject WifiHospotConnector wifiHospotConnector;
 
     private HotspotState state;
     private BroadcastReceiver stopReceiver;
@@ -81,17 +73,20 @@ public class HotspotService extends Service {
         // inject dependencies
         ((Share) getApplication()).getAppComponent().inject(this);
 
-        stopReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent != null && intent.getAction().equals(ACTION_STOP)) {
-                    stopHotspot();
-                }
-            }
-        };
+        stopReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        if (intent != null && intent.getAction().equals(ACTION_STOP)) {
+                            stopHotspot();
+                        }
+                    }
+                };
         state = new HotspotState(this);
         registerReceiver(stopReceiver, new IntentFilter(ACTION_STOP));
-        startForeground(HOTSPOT_NOTIFICATION_ID, buildForegroundNotification(getString(R.string.hotspot_start), false));
+        startForeground(
+                HOTSPOT_NOTIFICATION_ID,
+                buildForegroundNotification(getString(R.string.hotspot_start), false));
     }
 
     @Override
@@ -143,11 +138,15 @@ public class HotspotService extends Service {
         b.setContentTitle("ODK Share").setContentText(status);
         Intent targetIntent = new Intent(this, MainActivity.class);
         targetIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        b.setContentIntent(contentIntent).setSmallIcon(R.mipmap.ic_launcher).setWhen(System.currentTimeMillis());
+        PendingIntent contentIntent =
+                PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        b.setContentIntent(contentIntent)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setWhen(System.currentTimeMillis());
         if (showStopButton) {
             Intent stopIntent = new Intent(ACTION_STOP);
-            PendingIntent stopHotspot = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent stopHotspot =
+                    PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             b.addAction(R.drawable.ic_close, getString(R.string.stop), stopHotspot);
         }
         return (b.build());
@@ -180,7 +179,8 @@ public class HotspotService extends Service {
                     }
                 }
             } else if (id == STATUS) {
-                if (service.wifiHospotConnector == null || !service.wifiHospotConnector.isHotspotEnabled()) {
+                if (service.wifiHospotConnector == null
+                        || !service.wifiHospotConnector.isHotspotEnabled()) {
                     stopHotspot();
                 } else {
                     sendEmptyMessageDelayed(STATUS, notify_stop);

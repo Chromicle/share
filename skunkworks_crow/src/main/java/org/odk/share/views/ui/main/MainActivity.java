@@ -1,5 +1,7 @@
 package org.odk.share.views.ui.main;
 
+import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
+
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -15,7 +17,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -26,7 +27,10 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import javax.inject.Inject;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Form;
@@ -42,17 +46,10 @@ import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
 import org.odk.share.views.ui.instance.InstanceManagerTabs;
 import org.odk.share.views.ui.send.SendFormsActivity;
 import org.odk.share.views.ui.settings.SettingsActivity;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import timber.log.Timber;
 
-import static org.odk.share.utilities.PermissionUtils.APP_SETTING_REQUEST_CODE;
-
-public class MainActivity extends FormListActivity implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
+public class MainActivity extends FormListActivity
+        implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
     public static final String FORM_VERSION = "form_version";
     public static final String FORM_ID = "form_id";
@@ -64,26 +61,26 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.bSendForms)
     Button sendForms;
+
     @BindView(R.id.bReceiveForms)
     Button viewWifi;
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+
     @BindView(R.id.empty_view)
     TextView emptyView;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
-    @Inject
-    FormsDao formsDao;
+    @Inject FormsDao formsDao;
 
-    @Inject
-    TransferDao transferDao;
+    @Inject TransferDao transferDao;
 
     private FormsAdapter formAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +98,7 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
-        //check the storage permission and start the loader
+        // check the storage permission and start the loader
         setUpLoader();
 
         addListItemDivider();
@@ -211,18 +208,27 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.install_collect);
 
-        builder.setPositiveButton(getString(R.string.install), (DialogInterface dialog, int which) -> {
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
-            } catch (ActivityNotFoundException e) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
-            }
-        });
+        builder.setPositiveButton(
+                getString(R.string.install),
+                (DialogInterface dialog, int which) -> {
+                    try {
+                        startActivity(
+                                new Intent(
+                                        Intent.ACTION_VIEW, Uri.parse("market://details?id=" + COLLECT_PACKAGE)));
+                    } catch (ActivityNotFoundException e) {
+                        startActivity(
+                                new Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("https://play.google.com/store/apps/details?id=" + COLLECT_PACKAGE)));
+                    }
+                });
 
-        builder.setNegativeButton(getString(R.string.cancel), (DialogInterface dialog, int which) -> {
-            dialog.dismiss();
-            finish();
-        });
+        builder.setNegativeButton(
+                getString(R.string.cancel),
+                (DialogInterface dialog, int which) -> {
+                    dialog.dismiss();
+                    finish();
+                });
 
         builder.setCancelable(false);
         builder.show();
@@ -230,36 +236,44 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
 
     // call createODKDirs() with a permission check.
     private void createODKDirs() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
             Share.createODKDirs(this);
         } else {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+            requestPermissions(
+                    new String[] {
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+                    },
                     STORAGE_PERMISSION_REQUEST_CODE);
         }
     }
 
     private void addListItemDivider() {
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                DividerItemDecoration.VERTICAL);
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
 
         recyclerView.addItemDecoration(dividerItemDecoration);
-
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 setUpLoader();
             } else {
-                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        !shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-                    PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
+                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && !shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+                    PermissionUtils.showAppInfo(
+                            this,
+                            getPackageName(),
+                            getString(R.string.permission_open_storage_info),
+                            getString(R.string.permission_storage_denied));
                 } else {
-                    Toast.makeText(this, getString(R.string.permission_storage_denied), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.permission_storage_denied), Toast.LENGTH_SHORT)
+                            .show();
                     finish();
                 }
             }
@@ -272,7 +286,11 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
         if (requestCode == APP_SETTING_REQUEST_CODE) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-                PermissionUtils.showAppInfo(this, getPackageName(), getString(R.string.permission_open_storage_info), getString(R.string.permission_storage_denied));
+                PermissionUtils.showAppInfo(
+                        this,
+                        getPackageName(),
+                        getString(R.string.permission_open_storage_info),
+                        getString(R.string.permission_storage_denied));
             } else {
                 setUpLoader();
             }
@@ -280,8 +298,9 @@ public class MainActivity extends FormListActivity implements LoaderManager.Load
     }
 
     private void setUpLoader() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
 
             setupAdapter();
             getSupportLoaderManager().initLoader(FORM_LOADER, null, this);

@@ -6,13 +6,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
 import timber.log.Timber;
 
 /**
- * @author huangyz0918 (huangyz0918@gmail.com)
- * @since 04/06/2019
- */
+* @author huangyz0918 (huangyz0918@gmail.com)
+* @since 04/06/2019
+*/
 public class BluetoothReceiver extends BroadcastReceiver {
 
     private final BluetoothReceiverListener bluetoothReceiverListener;
@@ -20,10 +19,11 @@ public class BluetoothReceiver extends BroadcastReceiver {
     public BluetoothReceiver(Context context, BluetoothReceiverListener bluetoothReceiverListener) {
         this.bluetoothReceiverListener = bluetoothReceiverListener;
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED); //Bluetooth starts searching.
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //Bluetooth search ends.
-        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Bluetooth state changed.
-        filter.addAction(BluetoothDevice.ACTION_FOUND); //Bluetooth discovers new devices (unpaired devices).
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED); // Bluetooth starts searching.
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); // Bluetooth search ends.
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); // Bluetooth state changed.
+        filter.addAction(
+                BluetoothDevice.ACTION_FOUND); // Bluetooth discovers new devices (unpaired devices).
         context.registerReceiver(this, filter);
     }
 
@@ -61,9 +61,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
-    /**
-     * Listener for bluetooth devices when we found a new {@link BluetoothDevice}.
-     */
+    /** Listener for bluetooth devices when we found a new {@link BluetoothDevice}. */
     public interface BluetoothReceiverListener {
         void onDeviceFound(BluetoothDevice device);
 

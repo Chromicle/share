@@ -1,45 +1,44 @@
 package org.odk.share.views.ui.instance;
 
-import android.os.Bundle;
+import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.material.tabs.TabLayout;
-
-import org.odk.share.R;
-import org.odk.share.views.ui.common.ViewPagerAdapter;
-import org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment;
-import org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment;
-import org.odk.share.views.ui.instance.fragment.SentInstancesFragment;
-import org.odk.share.views.ui.instance.fragment.StatisticsFragment;
-import org.odk.share.views.ui.common.injectable.InjectableActivity;
-
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.google.android.material.tabs.TabLayout;
+import org.odk.share.R;
+import org.odk.share.views.ui.common.ViewPagerAdapter;
+import org.odk.share.views.ui.common.injectable.InjectableActivity;
+import org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment;
+import org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment;
+import org.odk.share.views.ui.instance.fragment.SentInstancesFragment;
+import org.odk.share.views.ui.instance.fragment.StatisticsFragment;
 
-import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
-
-public class InstanceManagerTabs extends InjectableActivity implements TabLayout.OnTabSelectedListener {
+public class InstanceManagerTabs extends InjectableActivity
+        implements TabLayout.OnTabSelectedListener {
 
     private final Object[][] tabs = {
-            {R.string.statistics, R.drawable.ic_stats, new StatisticsFragment()},
-            {R.string.sent, R.drawable.ic_upload, new SentInstancesFragment()},
-            {R.string.received, R.drawable.ic_download, new ReceivedInstancesFragment()},
-            {R.string.reviewed, R.drawable.ic_assignment, new ReviewedInstancesFragment()}
+        {R.string.statistics, R.drawable.ic_stats, new StatisticsFragment()},
+        {R.string.sent, R.drawable.ic_upload, new SentInstancesFragment()},
+        {R.string.received, R.drawable.ic_download, new ReceivedInstancesFragment()},
+        {R.string.reviewed, R.drawable.ic_assignment, new ReviewedInstancesFragment()}
     };
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.tabs)
     TabLayout tabLayout;
+
     @BindView(R.id.viewpager)
     ViewPager viewPager;
 
@@ -82,12 +81,12 @@ public class InstanceManagerTabs extends InjectableActivity implements TabLayout
 
         if (visible) {
             titleView.setVisibility(View.VISIBLE);
-            DrawableCompat.setTint(iconView.getDrawable(), ContextCompat.getColor(this,
-                    R.color.colorTabActive));
+            DrawableCompat.setTint(
+                    iconView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabActive));
         } else {
             titleView.setVisibility(View.GONE);
-            DrawableCompat.setTint(iconView.getDrawable(), ContextCompat.getColor(this,
-                    R.color.colorTabInactive));
+            DrawableCompat.setTint(
+                    iconView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabInactive));
         }
 
         tabLayout.getTabAt(position).setCustomView(view);
@@ -112,7 +111,8 @@ public class InstanceManagerTabs extends InjectableActivity implements TabLayout
         TextView title = view.findViewById(R.id.tvTabTitle);
         title.setVisibility(View.VISIBLE);
         ImageView imageView = view.findViewById(R.id.ivTabIcon);
-        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabActive));
+        DrawableCompat.setTint(
+                imageView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabActive));
     }
 
     @Override
@@ -121,11 +121,10 @@ public class InstanceManagerTabs extends InjectableActivity implements TabLayout
         TextView title = view.findViewById(R.id.tvTabTitle);
         title.setVisibility(View.GONE);
         ImageView imageView = view.findViewById(R.id.ivTabIcon);
-        DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabInactive));
+        DrawableCompat.setTint(
+                imageView.getDrawable(), ContextCompat.getColor(this, R.color.colorTabInactive));
     }
 
     @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-
-    }
+    public void onTabReselected(TabLayout.Tab tab) {}
 }

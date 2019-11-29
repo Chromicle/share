@@ -1,6 +1,6 @@
-
-
 package org.odk.share.views.ui.send.fragment;
+
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,14 +11,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import java.util.LinkedHashSet;
+import javax.inject.Inject;
 import org.odk.collect.android.dao.FormsDao;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.provider.FormsProviderAPI;
@@ -31,21 +34,9 @@ import org.odk.share.views.listeners.ItemClickListener;
 import org.odk.share.views.ui.common.basecursor.BaseCursorViewHolder;
 import org.odk.share.views.ui.main.FormsAdapter;
 
-import java.util.LinkedHashSet;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
-
-/**
- * Created by laksh on 10/29/2018.
- */
-
-public class BlankFormsFragment extends FormListFragment implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
+/** Created by laksh on 10/29/2018. */
+public class BlankFormsFragment extends FormListFragment
+        implements LoaderManager.LoaderCallbacks<Cursor>, ItemClickListener {
 
     public static final String FORM_IDS = "form_ids";
     private static final String FORM_CHOOSER_LIST_SORTING_ORDER = "formChooserListSortingOrder";
@@ -53,33 +44,33 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+
     @BindView(R.id.buttonholder)
     LinearLayout buttonLayout;
+
     @BindView(R.id.empty_view)
     TextView emptyView;
+
     @BindView(R.id.send_button)
     Button sendButton;
+
     @BindView(R.id.toggle_button)
     Button toggleButton;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
-    @Inject
-    FormsDao formsDao;
+    @Inject FormsDao formsDao;
 
-    @Inject
-    TransferDao transferDao;
+    @Inject TransferDao transferDao;
 
     private FormsAdapter formAdapter;
     private LinkedHashSet<Long> selectedForms;
 
-
-    public BlankFormsFragment() {
-    }
+    public BlankFormsFragment() {}
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_forms, container, false);
         ButterKnife.bind(this, view);
@@ -108,7 +99,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             cursor.moveToFirst();
-            formAdapter = new FormsAdapter(getActivity(), cursor, this, selectedForms, instancesDao, transferDao);
+            formAdapter =
+                    new FormsAdapter(getActivity(), cursor, this, selectedForms, instancesDao, transferDao);
             recyclerView.setAdapter(formAdapter);
             setEmptyViewVisibility(cursor.getCount());
             if (formAdapter.getItemCount() > 0) {
@@ -123,10 +115,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
         addListItemDivider();
     }
 
-
     @Override
-    public void onLoaderReset(@NonNull Loader loader) {
-    }
+    public void onLoaderReset(@NonNull Loader loader) {}
 
     @Override
     public void onItemClick(BaseCursorViewHolder holder, int position) {
@@ -180,7 +170,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
             Cursor cursor = formAdapter.getCursor();
             if (cursor.moveToFirst()) {
                 do {
-                    selectedForms.add(cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
+                    selectedForms.add(
+                            cursor.getLong(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
                 } while (cursor.moveToNext());
             }
         } else {
@@ -215,9 +206,8 @@ public class BlankFormsFragment extends FormListFragment implements LoaderManage
     }
 
     private void addListItemDivider() {
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                DividerItemDecoration.VERTICAL);
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
 
         recyclerView.addItemDecoration(dividerItemDecoration);
     }

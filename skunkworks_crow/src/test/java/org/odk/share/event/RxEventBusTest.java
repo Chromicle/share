@@ -1,20 +1,16 @@
 package org.odk.share.event;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import io.reactivex.observers.TestObserver;
 import org.junit.Test;
 import org.odk.share.events.RxEvent;
 import org.odk.share.rx.RxEventBus;
 
-import io.reactivex.observers.TestObserver;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class RxEventBusTest {
 
-    /**
-     * Verifies that when subscription takes place the Subject knows this has
-     * happened.
-     */
+    /** Verifies that when subscription takes place the Subject knows this has happened. */
     @Test
     public void testEventBusSubscription() {
 
@@ -30,19 +26,18 @@ public class RxEventBusTest {
     }
 
     /**
-     * Ensures that the register method of the RxEvent Bus is filtering events appropriately.
-     * The assertValue method of TestObserver is used instead of AssertResult because
-     * AssertResult is used to check for completeness and RxRelay's main objective is
-     * to get rid of onComplete and onError that could damage a stream especially in the case
-     * of a bus.
-     */
+    * Ensures that the register method of the RxEvent Bus is filtering events appropriately. The
+    * assertValue method of TestObserver is used instead of AssertResult because AssertResult is used
+    * to check for completeness and RxRelay's main objective is to get rid of onComplete and onError
+    * that could damage a stream especially in the case of a bus.
+    */
     @Test
     public void testEventType() {
         RxEventBus bus = new RxEventBus();
 
         CoolerDummyEvent event = new CoolerDummyEvent();
 
-        //RxEvent that won't get propagated to the observer.
+        // RxEvent that won't get propagated to the observer.
         DummyEvent dummyEvent = new DummyEvent();
 
         TestObserver<CoolerDummyEvent> testObserver = bus.register(CoolerDummyEvent.class).test();
@@ -53,9 +48,7 @@ public class RxEventBusTest {
         testObserver.assertValue(event);
     }
 
-    private class DummyEvent extends RxEvent {
-    }
+    private class DummyEvent extends RxEvent {}
 
-    private class CoolerDummyEvent extends RxEvent {
-    }
+    private class CoolerDummyEvent extends RxEvent {}
 }

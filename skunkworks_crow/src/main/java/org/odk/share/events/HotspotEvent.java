@@ -13,7 +13,8 @@ public class HotspotEvent extends RxEvent {
     }
 
     public enum Status {
-        ENABLED, DISABLED
+        ENABLED,
+        DISABLED
     }
 
     @Override

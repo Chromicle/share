@@ -1,9 +1,6 @@
 package org.odk.share.dto;
 
-/**
- * Created by laksh on 8/2/2018.
- */
-
+/** Created by laksh on 8/2/2018. */
 public class InstanceMap {
     public static final String INSTANCE_UUID = "instance_uuid";
     public static final String ID = "_id";

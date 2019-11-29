@@ -1,5 +1,7 @@
 package org.odk.share.provider;
 
+import static org.odk.share.database.ShareDatabaseHelper.SHARE_TABLE_NAME;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -10,19 +12,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-
+import androidx.annotation.NonNull;
 import org.odk.share.application.Share;
 import org.odk.share.database.ShareDatabaseHelper;
 import org.odk.share.dto.TransferInstance;
 
-import androidx.annotation.NonNull;
-
-import static org.odk.share.database.ShareDatabaseHelper.SHARE_TABLE_NAME;
-
-/**
- * Created by laksh on 6/28/2018.
- */
-
+/** Created by laksh on 6/28/2018. */
 public class TransferProvider extends ContentProvider {
 
     private static final int TRANSFER = 1;
@@ -58,8 +53,12 @@ public class TransferProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
-                        String[] selectionArgs, String sortOrder) {
+    public Cursor query(
+            @NonNull Uri uri,
+            String[] projection,
+            String selection,
+            String[] selectionArgs,
+            String sortOrder) {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(SHARE_TABLE_NAME);
@@ -68,8 +67,7 @@ public class TransferProvider extends ContentProvider {
             case TRANSFER:
                 break;
             case TRANSFER_ID:
-                qb.appendWhere(TransferInstance.ID + "="
-                        + uri.getLastPathSegment());
+                qb.appendWhere(TransferInstance.ID + "=" + uri.getLastPathSegment());
                 break;
 
             default:
@@ -79,7 +77,15 @@ public class TransferProvider extends ContentProvider {
         Cursor c = null;
         ShareDatabaseHelper shareDatabaseHelper = getDbHelper();
         if (shareDatabaseHelper != null) {
-            c = qb.query(shareDatabaseHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
+            c =
+                    qb.query(
+                            shareDatabaseHelper.getReadableDatabase(),
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder);
             c.setNotificationUri(getContext().getContentResolver(), uri);
         }
 
@@ -141,13 +147,14 @@ public class TransferProvider extends ContentProvider {
 
                 case TRANSFER_ID:
                     String formId = uri.getLastPathSegment();
-                    count = db.delete(
-                            SHARE_TABLE_NAME,
-                            TransferInstance.ID
-                                    + "="
-                                    + formId
-                                    + (!TextUtils.isEmpty(where) ? " AND (" + where
-                                    + ')' : ""), whereArgs);
+                    count =
+                            db.delete(
+                                    SHARE_TABLE_NAME,
+                                    TransferInstance.ID
+                                            + "="
+                                            + formId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
+                                    whereArgs);
                     break;
 
                 default:
@@ -161,8 +168,7 @@ public class TransferProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String where,
-                      String[] whereArgs) {
+    public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
         int count = 0;
         ShareDatabaseHelper shareDatabaseHelper = getDbHelper();
         if (shareDatabaseHelper != null) {
@@ -174,14 +180,15 @@ public class TransferProvider extends ContentProvider {
 
                 case TRANSFER_ID:
                     String formId = uri.getLastPathSegment();
-                    count = db.update(
-                            SHARE_TABLE_NAME,
-                            values,
-                            TransferInstance.ID
-                                    + "="
-                                    + formId
-                                    + (!TextUtils.isEmpty(where) ? " AND ("
-                                    + where + ')' : ""), whereArgs);
+                    count =
+                            db.update(
+                                    SHARE_TABLE_NAME,
+                                    values,
+                                    TransferInstance.ID
+                                            + "="
+                                            + formId
+                                            + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
+                                    whereArgs);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown URI " + uri);

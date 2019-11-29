@@ -1,51 +1,5 @@
 package org.odk.share.tasks;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.ContentValues;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
-import android.preference.PreferenceManager;
-
-import androidx.annotation.NonNull;
-
-import com.evernote.android.job.Job;
-
-import org.odk.collect.android.dao.FormsDao;
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.provider.FormsProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.share.R;
-import org.odk.share.application.Share;
-import org.odk.share.dao.InstanceMapDao;
-import org.odk.share.dao.TransferDao;
-import org.odk.share.database.ShareDatabaseHelper;
-import org.odk.share.dto.TransferInstance;
-import org.odk.share.events.BluetoothEvent;
-import org.odk.share.events.DownloadEvent;
-import org.odk.share.rx.RxEventBus;
-import org.odk.share.utilities.ApplicationConstants;
-import org.odk.share.views.ui.settings.PreferenceKeys;
-
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
-
-import javax.inject.Inject;
-
-import timber.log.Timber;
-
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE;
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.DISPLAY_NAME;
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH;
@@ -64,6 +18,46 @@ import static org.odk.share.dto.TransferInstance.STATUS_FORM_RECEIVE;
 import static org.odk.share.dto.TransferInstance.TRANSFER_STATUS;
 import static org.odk.share.utilities.ApplicationConstants.SEND_FILL_FORM_MODE;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.ContentValues;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import androidx.annotation.NonNull;
+import com.evernote.android.job.Job;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import javax.inject.Inject;
+import org.odk.collect.android.dao.FormsDao;
+import org.odk.collect.android.dao.InstancesDao;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.share.R;
+import org.odk.share.application.Share;
+import org.odk.share.dao.InstanceMapDao;
+import org.odk.share.dao.TransferDao;
+import org.odk.share.database.ShareDatabaseHelper;
+import org.odk.share.dto.TransferInstance;
+import org.odk.share.events.BluetoothEvent;
+import org.odk.share.events.DownloadEvent;
+import org.odk.share.rx.RxEventBus;
+import org.odk.share.utilities.ApplicationConstants;
+import org.odk.share.views.ui.settings.PreferenceKeys;
+import timber.log.Timber;
+
 public class DownloadJob extends Job {
 
     public static final String TAG = "formDownloadJob";
@@ -71,20 +65,15 @@ public class DownloadJob extends Job {
     public static final String PORT = "port";
     private static final int TIMEOUT = 2000;
 
-    @Inject
-    RxEventBus rxEventBus;
+    @Inject RxEventBus rxEventBus;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
-    @Inject
-    FormsDao formsDao;
+    @Inject FormsDao formsDao;
 
-    @Inject
-    InstanceMapDao instanceMapDao;
+    @Inject InstanceMapDao instanceMapDao;
 
-    @Inject
-    TransferDao transferDao;
+    @Inject TransferDao transferDao;
 
     private String ip;
     private int port;
@@ -134,7 +123,8 @@ public class DownloadJob extends Job {
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(targetMacAddress);
                 if (bluetoothDevice != null) {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+                    SharedPreferences prefs =
+                            PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
                     boolean isSecureMode = prefs.getBoolean(PreferenceKeys.KEY_BLUETOOTH_SECURE_MODE, true);
                     if (isSecureMode) {
                         bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(SPP_UUID);
@@ -198,9 +188,7 @@ public class DownloadJob extends Job {
         return new DownloadEvent(DownloadEvent.Status.FINISHED, sbResult.toString());
     }
 
-    /**
-     * Close all the connections.
-     */
+    /** Close all the connections. */
     private void closeConnections() throws IOException {
         if (dos != null) {
             dos.close();
@@ -246,7 +234,11 @@ public class DownloadJob extends Job {
                 readForm();
             } else {
                 setupResultFormInfo(displayName, formVersion, formId);
-                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
+                sbResult.append(
+                        getContext()
+                                .getString(
+                                        R.string.form_transfer_result,
+                                        getContext().getString(R.string.msg_form_already_exist)));
                 sbResult.append(RESULT_DIVIDER);
             }
 
@@ -281,7 +273,11 @@ public class DownloadJob extends Job {
                 readForm();
             } else {
                 setupResultFormInfo(displayName, formVersion, formId);
-                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
+                sbResult.append(
+                        getContext()
+                                .getString(
+                                        R.string.form_transfer_result,
+                                        getContext().getString(R.string.msg_form_already_exist)));
                 sbResult.append(RESULT_DIVIDER);
             }
         } catch (IOException e) {
@@ -294,15 +290,20 @@ public class DownloadJob extends Job {
         String selection;
 
         if (formVersion == null) {
-            selectionArgs = new String[]{formId};
-            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
-                    + FormsProviderAPI.FormsColumns.JR_VERSION + " IS NULL";
+            selectionArgs = new String[] {formId};
+            selection =
+                    FormsProviderAPI.FormsColumns.JR_FORM_ID
+                            + "=? AND "
+                            + FormsProviderAPI.FormsColumns.JR_VERSION
+                            + " IS NULL";
         } else {
-            selectionArgs = new String[]{formId, formVersion};
-            selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=? AND "
-                    + FormsProviderAPI.FormsColumns.JR_VERSION + "=?";
+            selectionArgs = new String[] {formId, formVersion};
+            selection =
+                    FormsProviderAPI.FormsColumns.JR_FORM_ID
+                            + "=? AND "
+                            + FormsProviderAPI.FormsColumns.JR_VERSION
+                            + "=?";
         }
-
 
         Cursor cursor = formsDao.getFormsCursor(null, selection, selectionArgs, null);
         return cursor != null && cursor.getCount() > 0;
@@ -333,7 +334,8 @@ public class DownloadJob extends Job {
 
             // Add row in forms db
             ContentValues values = new ContentValues();
-            values.put(FormsProviderAPI.FormsColumns.FORM_FILE_PATH, getFormsPath() + File.separator + formName);
+            values.put(
+                    FormsProviderAPI.FormsColumns.FORM_FILE_PATH, getFormsPath() + File.separator + formName);
             values.put(FormsProviderAPI.FormsColumns.DISPLAY_NAME, displayName);
             values.put(FormsProviderAPI.FormsColumns.JR_FORM_ID, formId);
             values.put(FormsProviderAPI.FormsColumns.JR_VERSION, formVersion);
@@ -342,10 +344,18 @@ public class DownloadJob extends Job {
             formsDao.saveForm(values);
 
             setupResultFormInfo(displayName, formVersion, formId);
-            sbResult.append(getContext().getString(R.string.form_transfer_result,
-                    getContext().getString(R.string.success, ", " +
-                            getContext().getString(R.string.blank_form_count,
-                                    getContext().getString(R.string.received)))));
+            sbResult.append(
+                    getContext()
+                            .getString(
+                                    R.string.form_transfer_result,
+                                    getContext()
+                                            .getString(
+                                                    R.string.success,
+                                                    ", "
+                                                            + getContext()
+                                                                    .getString(
+                                                                            R.string.blank_form_count,
+                                                                            getContext().getString(R.string.received)))));
             sbResult.append(RESULT_DIVIDER);
         } catch (IOException e) {
             Timber.e(e);
@@ -369,15 +379,19 @@ public class DownloadJob extends Job {
     }
 
     private String getOdkDestinationDir() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            directoryPath = prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER,
-                    getContext().getString(R.string.default_odk_destination_dir));
+            directoryPath =
+                    prefs.getString(
+                            PreferenceKeys.KEY_ODK_DESTINATION_DIR_DIRECTORY_PICKER,
+                            getContext().getString(R.string.default_odk_destination_dir));
         } else {
-            directoryPath = prefs.getString(PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT,
-                    getContext().getString(R.string.default_odk_destination_dir));
-
+            directoryPath =
+                    prefs.getString(
+                            PreferenceKeys.KEY_ODK_DESTINATION_DIR_EDIT_TEXT,
+                            getContext().getString(R.string.default_odk_destination_dir));
         }
         return directoryPath;
     }
@@ -398,7 +412,9 @@ public class DownloadJob extends Job {
                     submissionUri = null;
                 }
 
-                Timber.d("Received uuid %s mode %s displayname %s submissionUri %s", uuid, mode, displayName, submissionUri);
+                Timber.d(
+                        "Received uuid %s mode %s displayname %s submissionUri %s",
+                        uuid, mode, displayName, submissionUri);
                 long id = instanceMapDao.getInstanceId(uuid);
 
                 if (mode == ApplicationConstants.SEND_REVIEW_MODE) {
@@ -412,8 +428,14 @@ public class DownloadJob extends Job {
                             Timber.d("Form not sent from this device for review");
                             dos.writeBoolean(false);
                             sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
-                            sbResult.append(getContext().getString(R.string.form_transfer_result,
-                                    getContext().getString(R.string.failed, ", " + getContext().getString(R.string.not_sent_for_review))));
+                            sbResult.append(
+                                    getContext()
+                                            .getString(
+                                                    R.string.form_transfer_result,
+                                                    getContext()
+                                                            .getString(
+                                                                    R.string.failed,
+                                                                    ", " + getContext().getString(R.string.not_sent_for_review))));
                             sbResult.append(RESULT_DIVIDER);
                             continue;
                         }
@@ -435,8 +457,9 @@ public class DownloadJob extends Job {
                 Timber.d("Feedback %s %s", feedbackStatus, feedback);
 
                 int numRes = dis.readInt();
-                String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS",
-                        Locale.ENGLISH).format(Calendar.getInstance().getTime());
+                String time =
+                        new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.ENGLISH)
+                                .format(Calendar.getInstance().getTime());
 
                 String path = getInstancesPath() + File.separator + formId + "_" + time;
                 String instanceFilePath = receiveFile(path);
@@ -472,8 +495,14 @@ public class DownloadJob extends Job {
                     shareValues.put(INSTANCE_ID, Long.parseLong(uri.getLastPathSegment()));
                     shareValues.put(TRANSFER_STATUS, STATUS_FORM_RECEIVE);
                     sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
-                    sbResult.append(getContext().getString(R.string.form_transfer_result,
-                            getContext().getString(R.string.success, ", " + getContext().getString(R.string.received_for_review))));
+                    sbResult.append(
+                            getContext()
+                                    .getString(
+                                            R.string.form_transfer_result,
+                                            getContext()
+                                                    .getString(
+                                                            R.string.success,
+                                                            ", " + getContext().getString(R.string.received_for_review))));
                     sbResult.append(RESULT_DIVIDER);
                     new ShareDatabaseHelper(getContext()).insertInstance(shareValues);
                 } else {
@@ -486,19 +515,31 @@ public class DownloadJob extends Job {
                         shareValues.put(INSTRUCTIONS, feedback);
                         shareValues.put(RECEIVED_REVIEW_STATUS, feedbackStatus);
                         selection = TransferInstance.ID + " =?";
-                        selectionArgs = new String[]{String.valueOf(transferInstance.getId())};
+                        selectionArgs = new String[] {String.valueOf(transferInstance.getId())};
                         transferDao.updateInstance(shareValues, selection, selectionArgs);
                         sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
-                        sbResult.append(getContext().getString(R.string.form_transfer_result,
-                                getContext().getString(R.string.success, ", " + getContext().getString(R.string.review_received))));
+                        sbResult.append(
+                                getContext()
+                                        .getString(
+                                                R.string.form_transfer_result,
+                                                getContext()
+                                                        .getString(
+                                                                R.string.success,
+                                                                ", " + getContext().getString(R.string.review_received))));
                         sbResult.append(RESULT_DIVIDER);
                     } else {
 
                         Timber.d("Writing received not first time");
                         dos.writeBoolean(true);
                         sbResult.append(getContext().getString(R.string.form_name, displayName) + "\n");
-                        sbResult.append(getContext().getString(R.string.form_transfer_result,
-                                getContext().getString(R.string.success, ", " + getContext().getString(R.string.updated))));
+                        sbResult.append(
+                                getContext()
+                                        .getString(
+                                                R.string.form_transfer_result,
+                                                getContext()
+                                                        .getString(
+                                                                R.string.success,
+                                                                ", " + getContext().getString(R.string.updated))));
                         sbResult.append(RESULT_DIVIDER);
                     }
                 }

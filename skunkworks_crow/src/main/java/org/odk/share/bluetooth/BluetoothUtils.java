@@ -3,16 +3,15 @@ package org.odk.share.bluetooth;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.os.Build;
-
 import java.util.Random;
 import java.util.UUID;
 
 /**
- * Basic tools for bluetooth features.
- *
- * @author huangyz0918 (huangyz0918@gmail.com)
- * @since 04/06/2019
- */
+* Basic tools for bluetooth features.
+*
+* @author huangyz0918 (huangyz0918@gmail.com)
+* @since 04/06/2019
+*/
 public class BluetoothUtils {
 
     // UUID for security bluetooth pairing.
@@ -20,9 +19,7 @@ public class BluetoothUtils {
     public static final int UUID_SEED = 0x110;
     public static final int RANDOM_BOUND = 5;
 
-    private BluetoothUtils() {
-
-    }
+    private BluetoothUtils() {}
 
     private static UUID getRandomUUID() {
         return UUID.nameUUIDFromBytes(random().getBytes());
@@ -45,44 +42,39 @@ public class BluetoothUtils {
     }
 
     /**
-     * Checking if current device supports bluetooth.
-     *
-     * @return true if the device supports Bluetooth otherwise throws an {@link IllegalStateException}.
-     */
+    * Checking if current device supports bluetooth.
+    *
+    * @return true if the device supports Bluetooth otherwise throws an {@link
+    *     IllegalStateException}.
+    */
     public static boolean isBluetoothSupported() {
         return getBluetoothAdapter() != null;
     }
 
     /**
-     * Checking if bluetooth is enabled.
-     *
-     * @return true if the bluetooth enabled.
-     */
+    * Checking if bluetooth is enabled.
+    *
+    * @return true if the bluetooth enabled.
+    */
     public static boolean isBluetoothEnabled() {
         return isBluetoothSupported() && getBluetoothAdapter().isEnabled();
     }
 
-    /**
-     * Disable the bluetooth.
-     */
+    /** Disable the bluetooth. */
     public static void disableBluetooth() {
         if (isBluetoothEnabled()) {
             getBluetoothAdapter().disable();
         }
     }
 
-    /**
-     * Enable the bluetooth.
-     */
+    /** Enable the bluetooth. */
     public static void enableBluetooth() {
         if (!isBluetoothEnabled()) {
             getBluetoothAdapter().enable();
         }
     }
 
-    /**
-     * Checking if the current {@link android.app.Activity} is finished or about to be finished.
-     */
+    /** Checking if the current {@link android.app.Activity} is finished or about to be finished. */
     public static boolean isActivityDestroyed(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             return activity.isDestroyed();
@@ -90,5 +82,4 @@ public class BluetoothUtils {
             return activity.isChangingConfigurations() || activity.isFinishing();
         }
     }
-
 }

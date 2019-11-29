@@ -6,30 +6,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import org.odk.share.R;
-import org.odk.share.views.listeners.OnItemClickListener;
-import org.odk.share.network.WifiNetworkInfo;
-import org.odk.share.views.customui.WifiView;
-
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.util.List;
+import org.odk.share.R;
+import org.odk.share.network.WifiNetworkInfo;
+import org.odk.share.views.customui.WifiView;
+import org.odk.share.views.listeners.OnItemClickListener;
 
-/**
- * Created by laksh on 5/22/2018.
- */
-
+/** Created by laksh on 5/22/2018. */
 public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.WifiHolder> {
 
     private final Context context;
     private final List<WifiNetworkInfo> wifiNetworkInfoList;
     private final OnItemClickListener listener;
 
-    public WifiResultAdapter(Context context, List<WifiNetworkInfo> wifiNetworkInfoList, OnItemClickListener listener) {
+    public WifiResultAdapter(
+            Context context, List<WifiNetworkInfo> wifiNetworkInfoList, OnItemClickListener listener) {
         this.context = context;
         this.wifiNetworkInfoList = wifiNetworkInfoList;
         this.listener = listener;
@@ -47,7 +42,9 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
         WifiNetworkInfo wifiNetworkInfo = wifiNetworkInfoList.get(holder.getAdapterPosition());
         holder.title.setText(wifiNetworkInfo.getSsid());
         holder.itemView.setOnClickListener(v -> listener.onItemClick(v, holder.getAdapterPosition()));
-        holder.wifiIcon.updateState(wifiNetworkInfo.getSecurityType() != WifiConfiguration.KeyMgmt.NONE, wifiNetworkInfo.getRssi());
+        holder.wifiIcon.updateState(
+                wifiNetworkInfo.getSecurityType() != WifiConfiguration.KeyMgmt.NONE,
+                wifiNetworkInfo.getRssi());
     }
 
     @Override
@@ -65,6 +62,7 @@ public class WifiResultAdapter extends RecyclerView.Adapter<WifiResultAdapter.Wi
 
         @BindView(R.id.tvTitle)
         TextView title;
+
         @BindView(R.id.ivWifi)
         WifiView wifiIcon;
 

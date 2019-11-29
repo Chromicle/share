@@ -1,5 +1,10 @@
 package org.odk.share.views.ui.instance.fragment;
 
+import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
+import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
+import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
+import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,11 +15,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import javax.inject.Inject;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
@@ -28,59 +39,41 @@ import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.views.ui.common.InstanceListFragment;
 import org.odk.share.views.ui.instance.adapter.TransferInstanceAdapter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static org.odk.share.views.ui.instance.InstancesList.INSTANCE_IDS;
-import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
-import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
-import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
-
-/**
- * Created by laksh on 6/27/2018.
- */
-
+/** Created by laksh on 6/27/2018. */
 public class ReviewedInstancesFragment extends InstanceListFragment implements OnItemClickListener {
 
     public static final String MODE = "mode";
-    private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER = "reviewedInstanceListSortingOrder";
+    private static final String REVIEWED_INSTANCE_LIST_SORTING_ORDER =
+            "reviewedInstanceListSortingOrder";
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
+
     @BindView(R.id.bToggle)
     Button toggleButton;
+
     @BindView(R.id.bAction)
     Button sendButton;
+
     @BindView(R.id.empty_view)
     TextView emptyView;
+
     @BindView(R.id.buttonholder)
     LinearLayout buttonLayout;
 
-    @Inject
-    InstancesDao instancesDao;
+    @Inject InstancesDao instancesDao;
 
-    @Inject
-    TransferDao transferDao;
+    @Inject TransferDao transferDao;
 
     HashMap<Long, Instance> instanceMap;
     TransferInstanceAdapter transferInstanceAdapter;
     List<TransferInstance> transferInstanceList;
 
-    public ReviewedInstancesFragment() {
-
-    }
+    public ReviewedInstancesFragment() {}
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_instances, container, false);
         ButterKnife.bind(this, view);
@@ -102,8 +95,10 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
     @Override
     protected void updateAdapter() {
         getInstanceFromDB();
-        setEmptyViewVisibility(getString(R.string.no_forms_reviewed,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        setEmptyViewVisibility(
+                getString(
+                        R.string.no_forms_reviewed,
+                        getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
     }
 
@@ -116,8 +111,10 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
     public void onResume() {
         getInstanceFromDB();
 
-        setEmptyViewVisibility(getString(R.string.no_forms_reviewed,
-                getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
+        setEmptyViewVisibility(
+                getString(
+                        R.string.no_forms_reviewed,
+                        getActivity().getIntent().getStringExtra(FORM_DISPLAY_NAME)));
         transferInstanceAdapter.notifyDataSetChanged();
         super.onResume();
     }
@@ -131,26 +128,33 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
         String selection;
 
         if (formVersion == null) {
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
+            selection =
+                    InstanceProviderAPI.InstanceColumns.JR_FORM_ID
+                            + "=? AND "
+                            + InstanceProviderAPI.InstanceColumns.JR_VERSION
+                            + " IS NULL";
             if (getFilterText().length() == 0) {
-                selectionArgs = new String[]{formId};
+                selectionArgs = new String[] {formId};
             } else {
-                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
+                selectionArgs = new String[] {formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         } else {
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
+            selection =
+                    InstanceProviderAPI.InstanceColumns.JR_FORM_ID
+                            + "=? AND "
+                            + InstanceProviderAPI.InstanceColumns.JR_VERSION
+                            + "=?";
             if (getFilterText().length() == 0) {
-                selectionArgs = new String[]{formId, formVersion};
+                selectionArgs = new String[] {formId, formVersion};
             } else {
-                selectionArgs = new String[]{formId, "%" + getFilterText() + "%"};
+                selectionArgs = new String[] {formId, "%" + getFilterText() + "%"};
                 selection = "AND " + InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " LIKE ?";
             }
         }
 
-        Cursor cursor = instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
+        Cursor cursor =
+                instancesDao.getInstancesCursor(null, selection, selectionArgs, getSortingOrder());
         instanceMap = instancesDao.getMapFromCursor(cursor);
 
         Cursor transferCursor = transferDao.getReviewedInstancesCursor();
@@ -164,7 +168,9 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
     }
 
     private void setupAdapter() {
-        transferInstanceAdapter = new TransferInstanceAdapter(getActivity(), transferInstanceList, this, selectedInstances, true);
+        transferInstanceAdapter =
+                new TransferInstanceAdapter(
+                        getActivity(), transferInstanceList, this, selectedInstances, true);
         recyclerView.setAdapter(transferInstanceAdapter);
     }
 
@@ -212,8 +218,10 @@ public class ReviewedInstancesFragment extends InstanceListFragment implements O
     }
 
     private void toggleButtonLabel() {
-        toggleButton.setText(selectedInstances.size() == transferInstanceAdapter.getItemCount() ?
-                getString(R.string.clear_all) : getString(R.string.select_all));
+        toggleButton.setText(
+                selectedInstances.size() == transferInstanceAdapter.getItemCount()
+                        ? getString(R.string.clear_all)
+                        : getString(R.string.select_all));
         sendButton.setEnabled(selectedInstances.size() > 0);
     }
 

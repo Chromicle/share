@@ -1,20 +1,19 @@
 package org.odk.share.views.ui.main;
 
-
-import org.odk.collect.android.provider.FormsProviderAPI;
-import org.odk.share.views.ui.common.applist.AppListActivity;
-
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_DATE_ASC;
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_DATE_DESC;
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_DESC;
 
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.share.views.ui.common.applist.AppListActivity;
+
 public abstract class FormListActivity extends AppListActivity {
 
-    protected static final String SORT_BY_NAME_ASC
-            = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
-    protected static final String SORT_BY_NAME_DESC
-            = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE DESC";
+    protected static final String SORT_BY_NAME_ASC =
+            FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE ASC";
+    protected static final String SORT_BY_NAME_DESC =
+            FormsProviderAPI.FormsColumns.DISPLAY_NAME + " COLLATE NOCASE DESC";
     protected static final String SORT_BY_DATE_ASC = FormsProviderAPI.FormsColumns.DATE + " ASC";
     protected static final String SORT_BY_DATE_DESC = FormsProviderAPI.FormsColumns.DATE + " DESC";
 

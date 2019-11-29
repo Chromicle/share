@@ -1,10 +1,9 @@
 package org.odk.share.events;
 
 /**
- * Base event that all RxEvent classes should extend.
- * All classes being passed through the event bus should have names ending in RxEvent so that other
- * developers know its purpose.
- */
+* Base event that all RxEvent classes should extend. All classes being passed through the event bus
+* should have names ending in RxEvent so that other developers know its purpose.
+*/
 public abstract class RxEvent {
     private String description;
 

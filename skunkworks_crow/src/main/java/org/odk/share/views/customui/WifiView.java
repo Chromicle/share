@@ -3,15 +3,10 @@ package org.odk.share.views.customui;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.util.AttributeSet;
-
+import androidx.appcompat.widget.AppCompatImageView;
 import org.odk.share.R;
 
-import androidx.appcompat.widget.AppCompatImageView;
-
-/**
- * Created by laksh on 5/25/2018.
- */
-
+/** Created by laksh on 5/25/2018. */
 public class WifiView extends AppCompatImageView {
     public WifiView(Context context) {
         super(context);

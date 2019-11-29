@@ -4,16 +4,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import timber.log.Timber;
 
-/**
- * Created by laksh on 5/17/2018.
- */
-
+/** Created by laksh on 5/17/2018. */
 public class WifiHospotConnector {
 
     private Method getWifiApConfig;
@@ -26,7 +21,8 @@ public class WifiHospotConnector {
     private WifiConfiguration currConfig;
 
     public WifiHospotConnector(Context context) {
-        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager =
+                (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         for (Method method : wifiManager.getClass().getMethods()) {
             switch (method.getName()) {
                 case "isWifiApEnabled":
@@ -49,7 +45,8 @@ public class WifiHospotConnector {
 
     public static boolean isMobileDataEnabled(Context context) {
         boolean enabled = false;
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         try {
             Class cmClass = Class.forName(cm.getClass().getName());
             Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
@@ -70,8 +67,11 @@ public class WifiHospotConnector {
     }
 
     public boolean isSupported() {
-        return isWifiApEnabled != null && setWifiApEnable != null && getWifiApState != null &&
-                getWifiApConfig != null && setWifiApConfig != null;
+        return isWifiApEnabled != null
+                && setWifiApEnable != null
+                && getWifiApState != null
+                && getWifiApConfig != null
+                && setWifiApConfig != null;
     }
 
     public WifiConfiguration getWifiConfig() {

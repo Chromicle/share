@@ -1,29 +1,21 @@
 package org.odk.share.utilities;
 
-
 public class ArrayUtils {
 
-    /**
-     * An empty immutable {@code Long} array.
-     */
+    /** An empty immutable {@code Long} array. */
     private static final Long[] EMPTY_LONG_OBJECT_ARRAY = new Long[0];
 
-    /**
-     * An empty immutable {@code long} array.
-     */
+    /** An empty immutable {@code long} array. */
     private static final long[] EMPTY_LONG_ARRAY = new long[0];
 
-
-    private ArrayUtils() {
-
-    }
+    private ArrayUtils() {}
 
     /**
-     * <p>Converts an array of primitive longs to objects.</p>
-     *
-     * @param array a {@code long} array
-     * @return a {@code Long} array
-     */
+    * Converts an array of primitive longs to objects.
+    *
+    * @param array a {@code long} array
+    * @return a {@code Long} array
+    */
     @SuppressWarnings("PMD.AvoidArrayLoops")
     public static Long[] toObject(long[] array) {
         if (array == null || array.length == 0) {
@@ -37,11 +29,11 @@ public class ArrayUtils {
     }
 
     /**
-     * <p>Converts an array of object Longs to primitives.</p>
-     *
-     * @param array a {@code Long} array
-     * @return a {@code long} array
-     */
+    * Converts an array of object Longs to primitives.
+    *
+    * @param array a {@code Long} array
+    * @return a {@code long} array
+    */
     @SuppressWarnings("PMD.AvoidArrayLoops")
     public static long[] toPrimitive(Long[] array) {
         if (array == null || array.length == 0) {

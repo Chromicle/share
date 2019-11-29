@@ -1,5 +1,11 @@
 package org.odk.share.views.ui.hotspot;
 
+import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
+import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
+import static org.odk.share.utilities.QRCodeUtils.PORT;
+import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
+import static org.odk.share.utilities.QRCodeUtils.SSID;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -22,17 +28,23 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
-
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.inject.Inject;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.odk.share.R;
@@ -49,27 +61,10 @@ import org.odk.share.utilities.DialogUtils;
 import org.odk.share.views.listeners.OnItemClickListener;
 import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
-import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES;
-import static org.odk.share.utilities.QRCodeUtils.PASSWORD;
-import static org.odk.share.utilities.QRCodeUtils.PORT;
-import static org.odk.share.utilities.QRCodeUtils.PROTECTED;
-import static org.odk.share.utilities.QRCodeUtils.SSID;
-
-public class HpReceiverActivity extends InjectableActivity implements OnItemClickListener, WifiStateListener {
+public class HpReceiverActivity extends InjectableActivity
+        implements OnItemClickListener, WifiStateListener {
 
     private static final int DIALOG_DOWNLOAD_PROGRESS = 1;
     private static final int DIALOG_CONNECTING = 2;
@@ -77,25 +72,27 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+
     @BindView(R.id.empty_view)
     TextView emptyView;
+
     @BindView(R.id.wifi_progress_bar)
     ProgressBar wifiProgressBar;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.bScanQRCode)
     Button scanQRCode;
+
     @BindView(R.id.bScan)
     Button scanWifi;
 
-    @Inject
-    ReceiverService receiverService;
+    @Inject ReceiverService receiverService;
 
-    @Inject
-    RxEventBus rxEventBus;
+    @Inject RxEventBus rxEventBus;
 
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Inject BaseSchedulerProvider schedulerProvider;
 
     private WifiResultAdapter wifiResultAdapter;
     private List<WifiNetworkInfo> scanResultList;
@@ -153,8 +150,8 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     }
 
     private boolean isPossibleHotspot(String ssid) {
-        return ssid.contains(getString(R.string.hotspot_name_suffix)) ||
-                ssid.contains(getString(R.string.hotspot_name_prefix_oreo));
+        return ssid.contains(getString(R.string.hotspot_name_suffix))
+                || ssid.contains(getString(R.string.hotspot_name_prefix_oreo));
     }
 
     @Override
@@ -173,52 +170,63 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     }
 
     private Disposable addDownloadEventSubscription() {
-        return rxEventBus.register(DownloadEvent.class)
+        return rxEventBus
+                .register(DownloadEvent.class)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.androidThread())
-                .subscribe(downloadEvent -> {
-                    switch (downloadEvent.getStatus()) {
-                        case QUEUED:
-                            Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
-                            break;
-                        case DOWNLOADING:
-                            int progress = downloadEvent.getCurrentProgress();
-                            int total = downloadEvent.getTotalSize();
-                            alertMsg = getString(R.string.receiving_items, String.valueOf(progress), String.valueOf(total));
-                            progressDialog.setMessage(alertMsg);
-                            break;
-                        case FINISHED:
-                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            String result = downloadEvent.getResult();
-                            createAlertDialog(getString(R.string.transfer_result), result);
-                            break;
-                        case ERROR:
-                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            createAlertDialog(getString(R.string.transfer_result), getString(R.string.error_while_downloading, downloadEvent.getResult()));
-                            break;
-                        case CANCELLED:
-                            Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
-                            dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
-                            break;
-                    }
-                }, Timber::e);
+                .subscribe(
+                        downloadEvent -> {
+                            switch (downloadEvent.getStatus()) {
+                                case QUEUED:
+                                    Toast.makeText(this, R.string.download_queued, Toast.LENGTH_SHORT).show();
+                                    break;
+                                case DOWNLOADING:
+                                    int progress = downloadEvent.getCurrentProgress();
+                                    int total = downloadEvent.getTotalSize();
+                                    alertMsg =
+                                            getString(
+                                                    R.string.receiving_items,
+                                                    String.valueOf(progress),
+                                                    String.valueOf(total));
+                                    progressDialog.setMessage(alertMsg);
+                                    break;
+                                case FINISHED:
+                                    dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                                    String result = downloadEvent.getResult();
+                                    createAlertDialog(getString(R.string.transfer_result), result);
+                                    break;
+                                case ERROR:
+                                    dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                                    createAlertDialog(
+                                            getString(R.string.transfer_result),
+                                            getString(R.string.error_while_downloading, downloadEvent.getResult()));
+                                    break;
+                                case CANCELLED:
+                                    Toast.makeText(this, getString(R.string.canceled), Toast.LENGTH_LONG).show();
+                                    dismissDialog(DIALOG_DOWNLOAD_PROGRESS);
+                                    break;
+                            }
+                        },
+                        Timber::e);
     }
 
-    /**
-     * Create the switch method button in the menu.
-     */
+    /** Create the switch method button in the menu. */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.switch_method_menu, menu);
         final MenuItem switchItem = menu.findItem(R.id.menu_switch);
-        switchItem.setOnMenuItemClickListener((MenuItem item) -> {
-            DialogUtils.createMethodSwitchDialog(this, (DialogInterface dialog, int which) -> {
-                receiverService.cancel();
-                wifiConnector.disableWifi(wifiNetworkSSID);
-                ActivityUtils.launchActivity(this, BtReceiverActivity.class, true);
-            }).show();
-            return true;
-        });
+        switchItem.setOnMenuItemClickListener(
+                (MenuItem item) -> {
+                    DialogUtils.createMethodSwitchDialog(
+                                    this,
+                                    (DialogInterface dialog, int which) -> {
+                                        receiverService.cancel();
+                                        wifiConnector.disableWifi(wifiNetworkSSID);
+                                        ActivityUtils.launchActivity(this, BtReceiverActivity.class, true);
+                                    })
+                            .show();
+                    return true;
+                });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -235,12 +243,18 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     public void onItemClick(View view, int position) {
         Timber.d("Clicked %s", scanResultList.get(position));
 
-        if (scanResultList.get(position).getSsid().contains(getString(R.string.hotspot_name_prefix_oreo))) {
+        if (scanResultList
+                .get(position)
+                .getSsid()
+                .contains(getString(R.string.hotspot_name_prefix_oreo))) {
             Toast.makeText(this, getString(R.string.scan_alert_oreo), Toast.LENGTH_LONG).show();
         } else if (scanResultList.get(position).getSecurityType() != WifiConfiguration.KeyMgmt.NONE) {
             showPasswordDialog(scanResultList.get(position));
         } else {
-            connectToNetwork(scanResultList.get(position).getSecurityType(), scanResultList.get(position).getSsid(), null);
+            connectToNetwork(
+                    scanResultList.get(position).getSecurityType(),
+                    scanResultList.get(position).getSsid(),
+                    null);
         }
     }
 
@@ -258,21 +272,25 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
         new AlertDialog.Builder(this)
                 .setTitle("Enter port number")
                 .setView(input)
-                .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                    String portInput = input.getText().toString();
-                    Timber.d("Port : %s", portInput);
-                    if (portInput.length() > 0) {
-                        dialog.dismiss();
-                        port = Integer.parseInt(portInput);
-                        startReceiveTask();
-                    } else {
-                        input.setError(getString(R.string.port_empty));
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
-                    isConnected = false;
-                    dialog.cancel();
-                })
+                .setPositiveButton(
+                        getString(R.string.ok),
+                        (dialog, which) -> {
+                            String portInput = input.getText().toString();
+                            Timber.d("Port : %s", portInput);
+                            if (portInput.length() > 0) {
+                                dialog.dismiss();
+                                port = Integer.parseInt(portInput);
+                                startReceiveTask();
+                            } else {
+                                input.setError(getString(R.string.port_empty));
+                            }
+                        })
+                .setNegativeButton(
+                        getString(R.string.cancel),
+                        (dialog, which) -> {
+                            isConnected = false;
+                            dialog.cancel();
+                        })
                 .create()
                 .show();
     }
@@ -284,13 +302,15 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
         final View dialogView = factory.inflate(R.layout.dialog_password, null);
         final EditText passwordEditText = dialogView.findViewById(R.id.etPassword);
         final CheckBox passwordCheckBox = dialogView.findViewById(R.id.checkBox);
-        passwordCheckBox.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (!passwordCheckBox.isChecked()) {
-                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            } else {
-                passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            }
-        });
+        passwordCheckBox.setOnCheckedChangeListener(
+                (compoundButton, b) -> {
+                    if (!passwordCheckBox.isChecked()) {
+                        passwordEditText.setInputType(
+                                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    } else {
+                        passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    }
+                });
         builder.setTitle(scanResult.getSsid());
         builder.setView(dialogView);
         builder.setPositiveButton(getString(R.string.connect), null);
@@ -298,22 +318,27 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
 
         builder.setCancelable(false);
         alertDialog = builder.create();
-        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        alertDialog.setOnShowListener(dialog -> {
-            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
-                String pw = passwordEditText.getText().toString();
-                if (!pw.equals("")) {
-                    Timber.d(pw);
-                    dialog.dismiss();
-                    wifiNetworkSSID = scanResult.getSsid();
-                    wifiConnector.connectToWifi(scanResult.getSecurityType(), scanResult.getSsid(), pw);
-                    removeDialog(DIALOG_CONNECTING);
-                } else {
-                    passwordEditText.setError(getString(R.string.password_empty));
-                }
-            });
-        });
+        alertDialog
+                .getWindow()
+                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        alertDialog.setOnShowListener(
+                dialog -> {
+                    Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                    button.setOnClickListener(
+                            view -> {
+                                String pw = passwordEditText.getText().toString();
+                                if (!pw.equals("")) {
+                                    Timber.d(pw);
+                                    dialog.dismiss();
+                                    wifiNetworkSSID = scanResult.getSsid();
+                                    wifiConnector.connectToWifi(
+                                            scanResult.getSecurityType(), scanResult.getSsid(), pw);
+                                    removeDialog(DIALOG_CONNECTING);
+                                } else {
+                                    passwordEditText.setError(getString(R.string.password_empty));
+                                }
+                            });
+                });
         alertDialog.show();
     }
 
@@ -369,7 +394,9 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                 progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
-                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
+                progressDialog.setButton(
+                        DialogInterface.BUTTON_NEGATIVE,
+                        getString(R.string.cancel),
                         (dialog, which) -> {
                             receiverService.cancel();
                             dialog.dismiss();
@@ -382,7 +409,9 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                 progressDialog.setMessage(alertMsg);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setCancelable(false);
-                progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
+                progressDialog.setButton(
+                        DialogInterface.BUTTON_NEGATIVE,
+                        getString(R.string.cancel),
                         (dialog, which) -> {
                             dialog.dismiss();
                             startScan();
@@ -430,7 +459,15 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
                         passwordScanned = (String) obj.get(PASSWORD);
                     }
 
-                    Timber.d("Scanned results " + ssidScanned + " " + port + " " + isProtected + " " + passwordScanned);
+                    Timber.d(
+                            "Scanned results "
+                                    + ssidScanned
+                                    + " "
+                                    + port
+                                    + " "
+                                    + isProtected
+                                    + " "
+                                    + passwordScanned);
                     isQRCodeScanned = true;
                     startScan();
                 } catch (JSONException e) {
@@ -448,7 +485,8 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
         Timber.d(wifiNetworkSSID + " " + connectedSsid + " " + detailedState.toString());
 
         for (WifiNetworkInfo wifiNetworkInfo : scanResultList) {
-            if (wifiNetworkInfo.getSsid().equals(connectedSsid) && wifiNetworkInfo.getSsid().equals(wifiNetworkSSID)) {
+            if (wifiNetworkInfo.getSsid().equals(connectedSsid)
+                    && wifiNetworkInfo.getSsid().equals(wifiNetworkSSID)) {
                 wifiNetworkInfo.setState(detailedState);
                 wifiResultAdapter.notifyItemChanged(scanResultList.indexOf(wifiNetworkInfo));
 
@@ -463,7 +501,8 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
     }
 
     private void onConnected() {
-        Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Connected to " + wifiNetworkSSID, Toast.LENGTH_LONG)
+                .show();
 
         removeDialog(DIALOG_CONNECTING);
 
@@ -508,9 +547,9 @@ public class HpReceiverActivity extends InjectableActivity implements OnItemClic
         setEmptyViewVisibility(getString(R.string.no_wifi_available));
 
         /*
-         * Adding a double verification to check whether the ssid returned by scanned QR Code
-         * actually exists or not.
-         */
+        * Adding a double verification to check whether the ssid returned by scanned QR Code
+        * actually exists or not.
+        */
         if (isQRCodeScanned) {
             isQRCodeScanned = false;
             for (WifiNetworkInfo info : list) {

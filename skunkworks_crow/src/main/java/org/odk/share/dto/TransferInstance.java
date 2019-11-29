@@ -2,10 +2,7 @@ package org.odk.share.dto;
 
 import org.odk.collect.android.dto.Instance;
 
-/**
- * Created by laksh on 6/13/2018.
- */
-
+/** Created by laksh on 6/13/2018. */
 public class TransferInstance {
     public static final String ID = "_id";
     public static final String REVIEW_STATUS = "reviewStatus";

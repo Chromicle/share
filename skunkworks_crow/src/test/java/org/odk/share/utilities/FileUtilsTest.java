@@ -1,14 +1,12 @@
 package org.odk.share.utilities;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class FileUtilsTest {
 
-    /**
-     * {@link Test} for getting a file's extension.
-     */
+    /** {@link Test} for getting a file's extension. */
     @Test
     public void getFileExtensionTest() {
         assertEquals("txt", FileUtils.getFileExtension("xxxx.txt"));

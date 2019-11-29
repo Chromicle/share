@@ -1,10 +1,9 @@
 package org.odk.share.tasks;
 
-import com.evernote.android.job.Job;
-import com.evernote.android.job.JobCreator;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.evernote.android.job.Job;
+import com.evernote.android.job.JobCreator;
 
 public class ShareJobCreator implements JobCreator {
 

@@ -1,16 +1,12 @@
 package org.odk.share.views.ui.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Created by laksh on 10/29/2018.
- */
-
+/** Created by laksh on 10/29/2018. */
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     private final List<Fragment> fragmentList = new ArrayList<>();
     private final List<String> fragmentTitleList = new ArrayList<>();

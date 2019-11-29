@@ -13,27 +13,23 @@ limitations under the License.
 
 package org.odk.share.views.ui.common.applist;
 
+import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
+
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-
+import java.util.LinkedHashSet;
 import org.odk.share.R;
 import org.odk.share.views.ui.common.injectable.InjectableFragment;
-
-import java.util.LinkedHashSet;
-
-import static org.odk.share.utilities.ApplicationConstants.SortingOrder.BY_NAME_ASC;
 
 public abstract class AppListFragment extends InjectableFragment {
 
@@ -54,41 +50,46 @@ public abstract class AppListFragment extends InjectableFragment {
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint(getResources().getString(R.string.search));
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        SearchView.SearchAutoComplete searchAutoComplete =
+                searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setCursorVisible(true);
-        searchAutoComplete.setHintTextColor(ContextCompat.getColor(getActivity(), android.R.color.white));
+        searchAutoComplete.setHintTextColor(
+                ContextCompat.getColor(getActivity(), android.R.color.white));
         searchAutoComplete.setTextColor(ContextCompat.getColor(getActivity(), android.R.color.white));
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterText = query;
-                updateAdapter();
-                searchView.clearFocus();
-                return false;
-            }
+        searchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        filterText = query;
+                        updateAdapter();
+                        searchView.clearFocus();
+                        return false;
+                    }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterText = newText;
-                updateAdapter();
-                return false;
-            }
-        });
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        filterText = newText;
+                        updateAdapter();
+                        return false;
+                    }
+                });
 
-        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                sortItem.setVisible(false);
-                return true;
-            }
+        MenuItemCompat.setOnActionExpandListener(
+                searchItem,
+                new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        sortItem.setVisible(false);
+                        return true;
+                    }
 
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                sortItem.setVisible(true);
-                return true;
-            }
-        });
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        sortItem.setVisible(true);
+                        return true;
+                    }
+                });
     }
 
     @Override
@@ -119,18 +120,25 @@ public abstract class AppListFragment extends InjectableFragment {
         View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
         final RecyclerView recyclerView = sheetView.findViewById(R.id.recyclerView);
 
-        sortingOptions = new String[]{
-                getString(R.string.sort_by_name_asc), getString(R.string.sort_by_name_desc),
-                getString(R.string.sort_by_date_asc), getString(R.string.sort_by_date_desc)
-        };
-        final SortDialogAdapter adapter = new SortDialogAdapter(getActivity(), recyclerView, sortingOptions, getSelectedSortingOrder(), new SortDialogAdapter.RecyclerViewClickListener() {
-            @Override
-            public void onItemClicked(SortDialogAdapter.ViewHolder holder, int position) {
-                holder.updateItemColor(selectedSortingOrder);
-                performSelectedSearch(position);
-                bottomSheetDialog.dismiss();
-            }
-        });
+        sortingOptions =
+                new String[] {
+                    getString(R.string.sort_by_name_asc), getString(R.string.sort_by_name_desc),
+                    getString(R.string.sort_by_date_asc), getString(R.string.sort_by_date_desc)
+                };
+        final SortDialogAdapter adapter =
+                new SortDialogAdapter(
+                        getActivity(),
+                        recyclerView,
+                        sortingOptions,
+                        getSelectedSortingOrder(),
+                        new SortDialogAdapter.RecyclerViewClickListener() {
+                            @Override
+                            public void onItemClicked(SortDialogAdapter.ViewHolder holder, int position) {
+                                holder.updateItemColor(selectedSortingOrder);
+                                performSelectedSearch(position);
+                                bottomSheetDialog.dismiss();
+                            }
+                        });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -152,9 +160,9 @@ public abstract class AppListFragment extends InjectableFragment {
     }
 
     protected void restoreSelectedSortingOrder() {
-        selectedSortingOrder = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getInt(getSortingOrderKey(), BY_NAME_ASC);
+        selectedSortingOrder =
+                PreferenceManager.getDefaultSharedPreferences(getContext())
+                        .getInt(getSortingOrderKey(), BY_NAME_ASC);
     }
 
     protected int getSelectedSortingOrder() {

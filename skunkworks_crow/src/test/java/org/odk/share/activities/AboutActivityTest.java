@@ -1,11 +1,15 @@
 package org.odk.share.activities;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.robolectric.Shadows.shadowOf;
+import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 
 import android.content.Intent;
 import android.view.View;
-
 import androidx.appcompat.widget.Toolbar;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +24,6 @@ import org.robolectric.annotation.LooperMode;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowLog;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.robolectric.Shadows.shadowOf;
-import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 
 @RunWith(RobolectricTestRunner.class)
 @LooperMode(PAUSED)
@@ -47,42 +43,40 @@ public class AboutActivityTest {
         aboutActivity = Robolectric.setupActivity(AboutActivity.class);
     }
 
-    /**
-     * {@link Test} to assert {@link AboutActivity} for not null.
-     */
+    /** {@link Test} to assert {@link AboutActivity} for not null. */
     @Test
     public void shouldNotBeNull() {
         assertNotNull(aboutActivity);
     }
 
-    /**
-     * {@link Test} to assert title of {@link AboutActivity} for not null.
-     */
+    /** {@link Test} to assert title of {@link AboutActivity} for not null. */
     @Test
     public void titleTest() throws Exception {
         Toolbar toolbar = aboutActivity.findViewById(R.id.toolbar);
         assertEquals(aboutActivity.getString(R.string.about), toolbar.getTitle());
     }
 
-    /**
-     * {@link Test} the {@link AboutAdapter} for the correct item account.
-     */
+    /** {@link Test} the {@link AboutAdapter} for the correct item account. */
     @Test
     public void aboutAdapterTest() {
-        //test the click event of about items.
+        // test the click event of about items.
         ShadowActivity shadowActivity = shadowOf(aboutActivity);
-        AboutAdapter adapter = new AboutAdapter(aboutActivity, (View v, int position) -> {
-            {
-                Intent startedIntent = shadowActivity.getNextStartedActivity();
-                ShadowIntent shadowIntent = shadowOf(startedIntent);
-                assertEquals(WebViewActivity.class.getName(),
-                        shadowIntent.getIntentClass().getName());
-                assertEquals("file:///android_asset/open_source_licenses.html",
-                        startedIntent.getStringExtra("url"));
-            }
-        });
+        AboutAdapter adapter =
+                new AboutAdapter(
+                        aboutActivity,
+                        (View v, int position) -> {
+                            {
+                                Intent startedIntent = shadowActivity.getNextStartedActivity();
+                                ShadowIntent shadowIntent = shadowOf(startedIntent);
+                                assertEquals(
+                                        WebViewActivity.class.getName(), shadowIntent.getIntentClass().getName());
+                                assertEquals(
+                                        "file:///android_asset/open_source_licenses.html",
+                                        startedIntent.getStringExtra("url"));
+                            }
+                        });
 
-        //test the item operations with about adapter.
+        // test the item operations with about adapter.
         assertEquals(0, adapter.getItemCount());
 
         aboutItems.add(new AboutItem(R.string.open_source_licenses, R.drawable.ic_stars));

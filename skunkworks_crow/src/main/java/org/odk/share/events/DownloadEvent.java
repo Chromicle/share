@@ -39,7 +39,11 @@ public class DownloadEvent extends RxEvent {
     }
 
     public enum Status {
-        QUEUED, DOWNLOADING, FINISHED, ERROR, CANCELLED
+        QUEUED,
+        DOWNLOADING,
+        FINISHED,
+        ERROR,
+        CANCELLED
     }
 
     @Override

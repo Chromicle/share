@@ -4,13 +4,9 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
-
 import java.io.File;
 
-/**
- * Created by laksh on 6/13/2018.
- */
-
+/** Created by laksh on 6/13/2018. */
 public class DatabaseContext extends ContextWrapper {
     private String path;
 
@@ -25,12 +21,17 @@ public class DatabaseContext extends ContextWrapper {
     }
 
     @Override
-    public SQLiteDatabase openOrCreateDatabase(String name, int mode, SQLiteDatabase.CursorFactory factory, DatabaseErrorHandler errorHandler) {
-       return openOrCreateDatabase(name, mode, factory);
+    public SQLiteDatabase openOrCreateDatabase(
+            String name,
+            int mode,
+            SQLiteDatabase.CursorFactory factory,
+            DatabaseErrorHandler errorHandler) {
+        return openOrCreateDatabase(name, mode, factory);
     }
 
     @Override
-    public SQLiteDatabase openOrCreateDatabase(String name, int mode, SQLiteDatabase.CursorFactory factory) {
+    public SQLiteDatabase openOrCreateDatabase(
+            String name, int mode, SQLiteDatabase.CursorFactory factory) {
         return SQLiteDatabase.openOrCreateDatabase(getDatabasePath(name), null);
     }
 }

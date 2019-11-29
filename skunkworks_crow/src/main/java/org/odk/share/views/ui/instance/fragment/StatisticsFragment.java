@@ -1,5 +1,9 @@
 package org.odk.share.views.ui.instance.fragment;
 
+import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
+import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
+import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
+
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -7,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -15,7 +21,10 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import javax.inject.Inject;
 import org.odk.collect.android.dao.InstancesDao;
 import org.odk.collect.android.dto.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI;
@@ -24,49 +33,30 @@ import org.odk.share.dao.TransferDao;
 import org.odk.share.dto.TransferInstance;
 import org.odk.share.views.ui.common.injectable.InjectableFragment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-import static org.odk.share.views.ui.main.MainActivity.FORM_DISPLAY_NAME;
-import static org.odk.share.views.ui.main.MainActivity.FORM_ID;
-import static org.odk.share.views.ui.main.MainActivity.FORM_VERSION;
-
-/**
- * Created by laksh on 6/27/2018.
- */
-
+/** Created by laksh on 6/27/2018. */
 public class StatisticsFragment extends InjectableFragment {
 
     @BindView(R.id.formTitle)
     TextView title;
+
     @BindView(R.id.formSubTitle)
     TextView subtitle;
+
     @BindView(R.id.chart)
     BarChart chart;
 
-    @Inject
-    InstancesDao instancesDao;
-    @Inject
-    TransferDao transferDao;
+    @Inject InstancesDao instancesDao;
+    @Inject TransferDao transferDao;
 
     private String formVersion;
     private String formId;
     private String formName;
 
-    public StatisticsFragment() {
-
-    }
+    public StatisticsFragment() {}
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_stats, container, false);
         ButterKnife.bind(this, view);
 
@@ -91,13 +81,19 @@ public class StatisticsFragment extends InjectableFragment {
         String selection;
 
         if (formVersion == null) {
-            selectionArgs = new String[]{formId};
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + " IS NULL";
+            selectionArgs = new String[] {formId};
+            selection =
+                    InstanceProviderAPI.InstanceColumns.JR_FORM_ID
+                            + "=? AND "
+                            + InstanceProviderAPI.InstanceColumns.JR_VERSION
+                            + " IS NULL";
         } else {
-            selectionArgs = new String[]{formId, formVersion};
-            selection = InstanceProviderAPI.InstanceColumns.JR_FORM_ID + "=? AND "
-                    + InstanceProviderAPI.InstanceColumns.JR_VERSION + "=?";
+            selectionArgs = new String[] {formId, formVersion};
+            selection =
+                    InstanceProviderAPI.InstanceColumns.JR_FORM_ID
+                            + "=? AND "
+                            + InstanceProviderAPI.InstanceColumns.JR_VERSION
+                            + "=?";
         }
         Cursor cursor = instancesDao.getInstancesCursor(selection, selectionArgs);
         HashMap<Long, Instance> instanceMap = instancesDao.getMapFromCursor(cursor);

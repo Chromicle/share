@@ -8,11 +8,9 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-
 import timber.log.Timber;
 
 public final class WifiConnector {
@@ -20,7 +18,8 @@ public final class WifiConnector {
     private final WifiManager wifiManager;
 
     public WifiConnector(Context context) {
-        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager =
+                (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     private static String unquoted(String name) {
@@ -42,7 +41,8 @@ public final class WifiConnector {
         // Check if already connected to that wifi
         String currentSSID = getActiveConnection().getSSID();
 
-        NetworkInfo.DetailedState currentState = WifiInfo.getDetailedStateOf(getActiveConnection().getSupplicantState());
+        NetworkInfo.DetailedState currentState =
+                WifiInfo.getDetailedStateOf(getActiveConnection().getSupplicantState());
         if (currentState == NetworkInfo.DetailedState.CONNECTED && currentSSID.equals(quoted(ssid))) {
             Timber.d("Already connected");
             return;
@@ -73,7 +73,9 @@ public final class WifiConnector {
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
         }
 
-        Timber.d("Attempting new wifi connection, setting priority number to, connecting %s", config.priority);
+        Timber.d(
+                "Attempting new wifi connection, setting priority number to, connecting %s",
+                config.priority);
 
         int netId = wifiManager.addNetwork(config);
         if (netId == -1) {
@@ -100,10 +102,10 @@ public final class WifiConnector {
     }
 
     /**
-     * Uses the capConnectabilities from ScanResult to determine the security type
-     * (https://stackoverflow.com/questions/28905604/android-detecting-if-wifi-is-wep-wpa-wpa2-etc-programmatically)
-     * http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android-apps/2.0_r1/com/android/settings/wifi/AccessPointState.java#AccessPointState.getScanResultSecurity%28android.net.wifi.ScanResult%29
-     */
+    * Uses the capConnectabilities from ScanResult to determine the security type
+    * (https://stackoverflow.com/questions/28905604/android-detecting-if-wifi-is-wep-wpa-wpa2-etc-programmatically)
+    * http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android-apps/2.0_r1/com/android/settings/wifi/AccessPointState.java#AccessPointState.getScanResultSecurity%28android.net.wifi.ScanResult%29
+    */
     public int getScanResultSecurity(ScanResult scanResult) {
         final String cap = scanResult.capabilities;
         final String[] securityModes = {"WEP", "PSK", "EAP"};
@@ -116,10 +118,10 @@ public final class WifiConnector {
     }
 
     /**
-     * Gets SSID of Connected WiFi
-     *
-     * @return Returns the service set identifier (SSID) of the current 802.11 network
-     */
+    * Gets SSID of Connected WiFi
+    *
+    * @return Returns the service set identifier (SSID) of the current 802.11 network
+    */
     public String getWifiSSID() {
         if (wifiManager.getConnectionInfo().getSupplicantState() == SupplicantState.COMPLETED) {
             return unquoted(wifiManager.getConnectionInfo().getSSID());
@@ -128,10 +130,10 @@ public final class WifiConnector {
     }
 
     /**
-     * Is wifi enabled.
-     *
-     * @return the boolean
-     */
+    * Is wifi enabled.
+    *
+    * @return the boolean
+    */
     public boolean isWifiEnabled() {
         return wifiManager.isWifiEnabled();
     }
@@ -193,9 +195,11 @@ public final class WifiConnector {
     }
 
     private byte[] convertToBytes(int hostAddress) {
-        return new byte[]{(byte) (0xff & hostAddress),
-                (byte) (0xff & (hostAddress >> 8)),
-                (byte) (0xff & (hostAddress >> 16)),
-                (byte) (0xff & (hostAddress >> 24))};
+        return new byte[] {
+            (byte) (0xff & hostAddress),
+            (byte) (0xff & (hostAddress >> 8)),
+            (byte) (0xff & (hostAddress >> 16)),
+            (byte) (0xff & (hostAddress >> 24))
+        };
     }
 }

@@ -1,26 +1,25 @@
 package org.odk.share.views.ui.send;
 
 import android.os.Bundle;
-
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.android.material.tabs.TabLayout;
-
 import org.odk.share.R;
 import org.odk.share.views.ui.common.ViewPagerAdapter;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 import org.odk.share.views.ui.send.fragment.BlankFormsFragment;
 import org.odk.share.views.ui.send.fragment.FilledFormsFragment;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SendFormsActivity extends InjectableActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.tabs)
     TabLayout tabLayout;
+
     @BindView(R.id.viewpager)
     ViewPager viewPager;
 

@@ -1,25 +1,21 @@
 package org.odk.share.services;
 
+import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
+
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
-
+import java.util.LinkedList;
+import java.util.Queue;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.odk.share.application.Share;
 import org.odk.share.events.UploadEvent;
 import org.odk.share.rx.RxEventBus;
 import org.odk.share.rx.schedulers.BaseSchedulerProvider;
 import org.odk.share.tasks.UploadJob;
-
-import java.util.LinkedList;
-import java.util.Queue;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import timber.log.Timber;
-
-import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
 @Singleton
 public class SenderService {
@@ -38,27 +34,29 @@ public class SenderService {
     }
 
     private void addUploadJobSubscription() {
-        rxEventBus.register(UploadEvent.class)
+        rxEventBus
+                .register(UploadEvent.class)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.androidThread())
-                .doOnNext(uploadEvent -> {
-                    switch (uploadEvent.getStatus()) {
+                .doOnNext(
+                        uploadEvent -> {
+                            switch (uploadEvent.getStatus()) {
+                                case CANCELLED:
+                                case ERROR:
+                                    jobs.clear();
+                                    currentJob = null;
+                                    break;
 
-                        case CANCELLED:
-                        case ERROR:
-                            jobs.clear();
-                            currentJob = null;
-                            break;
-
-                        case FINISHED:
-                            if (jobs.size() > 0) {
-                                startJob(jobs.remove());
-                            } else {
-                                currentJob = null;
+                                case FINISHED:
+                                    if (jobs.size() > 0) {
+                                        startJob(jobs.remove());
+                                    } else {
+                                        currentJob = null;
+                                    }
+                                    break;
                             }
-                            break;
-                    }
-                }).subscribe();
+                        })
+                .subscribe();
     }
 
     public void startUploading(long[] instancesToSend, int port, int mode) {
@@ -78,9 +76,7 @@ public class SenderService {
         startJob(extras);
     }
 
-    /**
-     * start the uploading job or canceling the job.
-     */
+    /** start the uploading job or canceling the job. */
     private void startJob(JobRequest request) {
         request.schedule();
         Timber.d("Starting upload job %d : ", request.getJobId());
@@ -88,10 +84,7 @@ public class SenderService {
     }
 
     private void startJob(PersistableBundleCompat extras) {
-        JobRequest request = new JobRequest.Builder(UploadJob.TAG)
-                .addExtras(extras)
-                .startNow()
-                .build();
+        JobRequest request = new JobRequest.Builder(UploadJob.TAG).addExtras(extras).startNow().build();
 
         if (currentJob != null) {
             jobs.add(request);

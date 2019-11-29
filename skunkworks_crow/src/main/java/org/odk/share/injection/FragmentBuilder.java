@@ -1,15 +1,14 @@
 package org.odk.share.injection;
 
-import org.odk.share.views.ui.send.fragment.BlankFormsFragment;
-import org.odk.share.views.ui.send.fragment.FilledFormsFragment;
+import dagger.Module;
+import dagger.android.ContributesAndroidInjector;
+import org.odk.share.injection.config.scopes.PerActivity;
 import org.odk.share.views.ui.instance.fragment.ReceivedInstancesFragment;
 import org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment;
 import org.odk.share.views.ui.instance.fragment.SentInstancesFragment;
 import org.odk.share.views.ui.instance.fragment.StatisticsFragment;
-import org.odk.share.injection.config.scopes.PerActivity;
-
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
+import org.odk.share.views.ui.send.fragment.BlankFormsFragment;
+import org.odk.share.views.ui.send.fragment.FilledFormsFragment;
 
 @Module
 public abstract class FragmentBuilder {
