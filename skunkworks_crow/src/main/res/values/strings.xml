@@ -109,7 +109,7 @@
     <string name="date_at_time">EEE, MMM dd, yyyy \'at\' HH:mm</string> <!-- http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html -->
 
     <string name="form_name">Name: %s </string>
-    <string name="form_transfer_result">Result: %s </string>
+    <string name="form_transfer_result">Result</string>
     <string name="blank_form_count">Blank form %s \n</string>
     <string name="success">Success %s</string>
     <string name="failed">Failed %s</string>

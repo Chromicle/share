@@ -45,4 +45,11 @@
         <item name="android:layout_width">match_parent</item>
     </style>
 
+    <style name="MyProgressBarTwo" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="colorButtonNormal">#D3D3D3</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="android:progressDrawable">@drawable/progressbar_horizantal</item>
+        <item name="android:minWidth">200dp</item>
+    </style>
+
 </resources>

@@ -39,6 +39,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -98,6 +99,8 @@ public class DownloadJob extends Job {
     public static final String RESULT_DIVIDER = "---------------\n";
 
     private StringBuilder sbResult;
+    HashMap<String, String> sbRes = new HashMap<String, String>();
+
 
     @NonNull
     @Override
@@ -244,8 +247,7 @@ public class DownloadJob extends Job {
                 readForm();
             } else {
                 setupResultFormInfo(displayName, formVersion, formId);
-                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
-                sbResult.append(RESULT_DIVIDER);
+                sbRes.put(String.valueOf(R.string.form_transfer_result),getContext().getString(R.string.msg_form_already_exist));
             }
 
             // readInstances
@@ -279,8 +281,7 @@ public class DownloadJob extends Job {
                 readForm();
             } else {
                 setupResultFormInfo(displayName, formVersion, formId);
-                sbResult.append(getContext().getString(R.string.form_transfer_result, getContext().getString(R.string.msg_form_already_exist)));
-                sbResult.append(RESULT_DIVIDER);
+                sbRes.put(String.valueOf(R.string.form_transfer_result),getContext().getString(R.string.msg_form_already_exist));
             }
         } catch (IOException e) {
             Timber.e(e);

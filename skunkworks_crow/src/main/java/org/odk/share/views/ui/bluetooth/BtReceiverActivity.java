@@ -35,6 +35,7 @@ import org.odk.share.utilities.DialogUtils;
 import org.odk.share.utilities.PermissionUtils;
 import org.odk.share.views.ui.common.injectable.InjectableActivity;
 import org.odk.share.views.ui.hotspot.HpReceiverActivity;
+import org.odk.share.views.ui.send.SendFormsActivity;
 
 import javax.inject.Inject;
 
@@ -219,6 +220,8 @@ public class BtReceiverActivity extends InjectableActivity implements
                         case CONNECTED:
                             if (progressDialog != null) {
                                 progressDialog.setMessage(getString(R.string.connected_bluetooth_downloading));
+                                progressDialog.dismiss();
+                                ActivityUtils.launchActivity(this, TransferResult.class, false);
                             }
                             isConnected = true;
                             break;
@@ -357,7 +360,6 @@ public class BtReceiverActivity extends InjectableActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        compositeDisposable.add(addDownloadEventSubscription());
         compositeDisposable.add(addBluetoothEventSubscription());
     }
 

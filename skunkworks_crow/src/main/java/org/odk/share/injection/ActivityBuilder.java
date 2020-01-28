@@ -2,6 +2,7 @@ package org.odk.share.injection;
 
 import org.odk.share.views.ui.bluetooth.BtReceiverActivity;
 import org.odk.share.views.ui.bluetooth.BtSenderActivity;
+import org.odk.share.views.ui.bluetooth.TransferResult;
 import org.odk.share.views.ui.instance.InstanceManagerTabs;
 import org.odk.share.views.ui.instance.InstancesList;
 import org.odk.share.views.ui.main.MainActivity;
@@ -51,4 +52,8 @@ public abstract class ActivityBuilder {
     @PerActivity
     @ContributesAndroidInjector
     abstract BtSenderActivity provideBtSenderActivity();
+
+    @PerActivity
+    @ContributesAndroidInjector
+    abstract TransferResult provideTransferResult();
 }
