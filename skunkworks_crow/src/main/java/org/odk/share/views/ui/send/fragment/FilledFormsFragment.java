@@ -34,7 +34,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
 import static org.odk.share.views.ui.instance.fragment.ReviewedInstancesFragment.MODE;
 
@@ -117,11 +116,9 @@ public class FilledFormsFragment extends InstanceListFragment implements LoaderM
             setEmptyViewVisibility(0);
         }
 
-        try {
+        if (selectedInstances != null && sendButton != null) {
             sendButton.setEnabled(selectedInstances.size() > 0);
             toggleButtonLabel();
-        } catch (Exception e) {
-            Timber.e(e);
         }
     }
 

@@ -1,9 +1,11 @@
 package org.odk.share.tasks;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 
 import androidx.annotation.NonNull;
@@ -16,6 +18,7 @@ import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.share.R;
 import org.odk.share.application.Share;
+import org.odk.share.bluetooth.BluetoothUtils;
 import org.odk.share.dao.InstanceMapDao;
 import org.odk.share.dao.TransferDao;
 import org.odk.share.database.ShareDatabaseHelper;
@@ -120,6 +123,7 @@ public class UploadJob extends Job {
                 case Share.TransferMethod.BLUETOOTH:
                     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                     bluetoothServerSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(TAG, SPP_UUID);
+
                     bluetoothSocket = bluetoothServerSocket.accept();
 
                     if (bluetoothSocket.isConnected()) {
@@ -138,6 +142,7 @@ public class UploadJob extends Job {
             }
 
             rxEventBus.post(uploadInstances());
+
         } catch (IOException e) {
             Timber.e(e);
         }

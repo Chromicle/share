@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -72,6 +74,12 @@ public class BtReceiverActivity extends InjectableActivity implements
     @BindView(R.id.no_devices_view)
     View emptyDevicesView;
 
+    @BindView(R.id.scanning_progress_bar)
+    ProgressBar scanningProgressBar;
+
+    @BindView(R.id.view_available_devices_text)
+    LinearLayout viewAvailableDevicesText;
+
     @Inject
     ReceiverService receiverService;
 
@@ -86,7 +94,6 @@ public class BtReceiverActivity extends InjectableActivity implements
     private final BluetoothListAdapter bluetoothListAdapter = new BluetoothListAdapter(this);
     private boolean isConnected = false;
     private ProgressDialog progressDialog;
-    private ProgressDialog scanningDialog;
     private AlertDialog resultDialog;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -127,16 +134,6 @@ public class BtReceiverActivity extends InjectableActivity implements
      * build a new progress dialog waiting for the scanning progress.
      */
     private void setupDialogs() {
-        //scanning dialog
-        scanningDialog = new ProgressDialog(this);
-        scanningDialog.setCancelable(false);
-        scanningDialog.setTitle(getString(R.string.scanning_title));
-        scanningDialog.setMessage(getString(R.string.scanning_msg));
-        scanningDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.stop), (DialogInterface dialog, int which) -> {
-            dialog.dismiss();
-            bluetoothAdapter.cancelDiscovery();
-        });
-
         //result dialog
         resultDialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.transfer_result))
@@ -271,6 +268,7 @@ public class BtReceiverActivity extends InjectableActivity implements
             emptyDevicesView.setVisibility(View.VISIBLE);
         } else {
             emptyDevicesView.setVisibility(View.GONE);
+            viewAvailableDevicesText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -282,14 +280,17 @@ public class BtReceiverActivity extends InjectableActivity implements
 
     @Override
     public void onDiscoveryStarted() {
-        scanningDialog.show();
+        scanningProgressBar.setVisibility(View.VISIBLE);
         checkEmptyList();
         bluetoothListAdapter.clearBluetoothDeviceList();
     }
 
     @Override
     public void onDiscoveryFinished() {
-        scanningDialog.dismiss();
+        scanningProgressBar.setVisibility(View.GONE);
+        if (bluetoothListAdapter.getItemCount() == 0) {
+            viewAvailableDevicesText.setVisibility(View.GONE);
+        }
         checkEmptyList();
     }
 
